@@ -23,7 +23,7 @@ public class Register extends HttpServlet {
 	    response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();	    
 	    
-	    out.println("<html lang=\"de\">");
+	    out.println("<html lang=\"de\">"); 
 	    out.println("<head>");
 		out.println("<meta charset=\"utf-8\">");
 		out.println("<title>CoolSolutions Registrierung</title>");
