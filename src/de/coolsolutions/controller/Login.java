@@ -1,4 +1,4 @@
-package controller;
+package de.coolsolutions.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,7 +23,7 @@ public class Login extends HttpServlet {
 	    response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();	    
 	    
-	    out.println("<html lang=\"de\">");
+	    out.println("<html lang=\"en\">");
 	    out.println("<head>");
 		out.println("<meta charset=\"utf-8\">");
 		out.println("<title>CoolSolutions Login</title>");
@@ -44,6 +44,7 @@ public class Login extends HttpServlet {
 		out.println("</form>");
 		out.println("</div>");
 		out.println("</body>");
+		out.println("</html>");		
 	    
 	}
 

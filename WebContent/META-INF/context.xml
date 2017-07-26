@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Context path="/ConnectionPooling_MS_SQL_SERVER_2012" docBase="ConnectionPooling_MS_SQL_SERVER_2012" reloadable="true">
+
+<Resource
+name="jdbc/coolsolutions"
+auth="Container"
+type="javax.sql.DataSource" 
+factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+username="sa"
+password="Start4cbm"
+driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+url="jdbc:sqlserver://127.0.0.1;databaseName=shop"
+maxWait="-1"
+maxActive="20"
+maxIdle="10" 
+/>
+
+</Context>
