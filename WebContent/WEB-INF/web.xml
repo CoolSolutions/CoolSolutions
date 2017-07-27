@@ -4,4 +4,25 @@
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
+  
+  	<servlet>
+		<display-name>DBConnection</display-name>
+		<servlet-name>DBConnection</servlet-name>
+		<servlet-class>de.coolsolutions.controller.DBConnection</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DBConnection</servlet-name>
+		<url-pattern>/DBConnection</url-pattern>
+	</servlet-mapping>
+	
+	<!-- <servlet>
+		<display-name>DBQuery</display-name>
+		<servlet-name>DBQuery</servlet-name>
+		<servlet-class>de.coolsolutions.controller.DBQuery</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DBQuery</servlet-name>
+		<url-pattern>/DBQuery</url-pattern>
+	</servlet-mapping>
+	-->
 </web-app>

@@ -2,13 +2,17 @@ package de.coolsolutions.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import de.coolsolutions.model.Customer;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
+import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 /**
  * Servlet implementation class Register
@@ -57,7 +61,7 @@ public class Register extends HttpServlet {
 		out.println("<input type=\"text\" name=\"lastname\" id=\"inputLastname\" class=\"form-control\" placeholder=\"Nachname\" required>");
 		out.println("<br />");
 		
-		// Strasse
+		// Strasse + Hausnummer
 		out.println("<div class=\"row\">");
 		
 		out.println("<div class=\"col-xs-8\">");
@@ -68,6 +72,23 @@ public class Register extends HttpServlet {
 		out.println("<div class=\"col-xs-4\">");
 			out.println("<label for=\"inputStreetnumber\" class=\"sr-only\">Hausnummer</label>");
 			out.println("<input type=\"text\" name=\"streetnumber\" id=\"inputStreetnumber\" class=\"form-control\" placeholder=\"Hausnummer\" required>");
+		out.println("</div>");
+		
+		out.println("</div>");
+		
+		out.println("<br />");
+		
+		// PLZ + Ort
+		out.println("<div class=\"row\">");
+		
+		out.println("<div class=\"col-xs-4\">");
+			out.println("<label for=\"inputZipcode\" class=\"sr-only\">PLZ</label>");
+			out.println("<input type=\"text\" name=\"zipcode\" id=\"inputZipcode\" class=\"form-control\" placeholder=\"PLZ\" required>");
+		out.println("</div>");
+		
+		out.println("<div class=\"col-xs-8\">");
+			out.println("<label for=\"inputCity\" class=\"sr-only\">Ort</label>");
+			out.println("<input type=\"text\" name=\"city\" id=\"inputCity\" class=\"form-control\" placeholder=\"Ort\" required>");
 		out.println("</div>");
 		
 		out.println("</div>");
@@ -97,31 +118,105 @@ public class Register extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		/*
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		out.println("<html><head></head><body>..doPost: " + request.getParameter("send") + "</body></html>");
-		*/
 		
 		String gender = request.getParameter("gender");
-		String firstname = request.getParameter("firstname");
+		String surname = request.getParameter("surname");
 		String lastname = request.getParameter("lastname");
 		String street = request.getParameter("street");
 		String streetnumber = request.getParameter("streetnumber");
 		String zipcode = request.getParameter("zipcode");
 		String city = request.getParameter("city");
+		Integer cityId = null;	
+		String email = request.getParameter("email");
 		
-		Customer cust = new Customer(gender, firstname, lastname, street, streetnumber, zipcode, city);
+		// DB Connection
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
 
-		int city_id = cust.getCityId();
+		String resourcename = "java:comp/env/jdbc/coolsolutions";
+		DataSource ds = null;
 		
-		/*
+		String SQL = "";
+		String INS = "";
+
+		try
+		{
+			InitialContext jndiCntx = new InitialContext();
+			ds = (DataSource) jndiCntx.lookup(resourcename);
+
+			conn = ds.getConnection();
+
+			// Ort-ID ermitteln
+			SQL = "SELECT ID FROM Ort WHERE Ort = '" + city + "' AND PLZ = " + zipcode;						
+			
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(SQL);			
+			
+			if(rs.next()){
+				cityId = rs.getInt(1);											
+			}
+			// TODO - Auf Falscheingabe reagieren
+			
+			
+			// Kunden in DB eintragen
+//			SQL = "INSERT INTO Kunde (Name, Vorname, Strasse, Strassennummer, E_Mail, Ort_ID, Geschlecht) ";
+//			SQL += "VALUES (N'" + lastname + "', N'" + surname + "', N'" + street + "', N'" + streetnumber + "', N'" + email + "', " + cityId + ", N'" + gender + "')";
+
+			INS = "INSERT INTO Kunde (Name, Vorname, Strasse, Strassennummer, E_Mail, Ort_ID, Geschlecht) ";
+			INS += "VALUES (";
+			INS += "N'" + lastname + "'";
+			INS += ", N'" + surname + "'";
+			INS += ", N'" + street + "'";
+			INS += ", N'" + streetnumber + "'";
+			INS += ", N'" + email + "'";
+			INS += ", N'" + cityId + "'";
+			INS += ", N'" + gender + "')";
+			
+			int anzahl = stmt.executeUpdate(INS);			
+			// TODO - bei anzahl != 1 reagieren
+			
+			System.out.println(anzahl);
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		finally
+		{
+			if (rs != null)
+				try
+				{
+					rs.close();
+				}
+				catch (Exception e)
+				{
+				}
+			if (stmt != null)
+				try
+				{
+					stmt.close();
+				}
+				catch (Exception e)
+				{
+				}
+			if (conn != null)
+				try
+				{
+					conn.close();
+				}
+				catch (Exception e)
+				{
+				}
+		}
+		
+		//Customer cust = new Customer(gender, surname, lastname, street, streetnumber, cityId, email);
+
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		out.println("<html><head></head><body>..doPost: " + cust.getLastname() + "</body></html>");
-		*/
-				
+		out.println("<html><head></head><body>..doPost: " + cityId + "</body></html>");
 		
 	}
 

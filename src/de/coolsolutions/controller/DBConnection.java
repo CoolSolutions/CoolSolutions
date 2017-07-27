@@ -17,9 +17,15 @@ import javax.sql.DataSource;
  * @author tomaszu
  *
  */
+
 public class DBConnection extends javax.servlet.http.HttpServlet implements
 		javax.servlet.Servlet
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1803157699891565696L;
 
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException
@@ -42,7 +48,7 @@ public class DBConnection extends javax.servlet.http.HttpServlet implements
 
 			conn = ds.getConnection();
 
-			String SQL = "SELECT * FROM Ort WHERE Ort = 'Bremen' AND PLZ = 28307";
+			String SQL = "SELECT ID FROM Ort WHERE Ort = 'Bremen' AND PLZ = 28307";
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(SQL);
 
