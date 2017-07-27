@@ -94,7 +94,17 @@ public class Angebote extends HttpServlet {
 				
 			}
 			
-			out.println("<html><head><link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\"><title>Unsere " + max + " Angebote für Sie</title></br>&nbsp&nbsp&nbsp&nbsp<a href=http://localhost:8080/CoolSolutions/Login>Anmelden</a>&nbsp&nbsp&nbsp&nbsp<a href=http://localhost:8080/CoolSolutions/Register>Registrieren</a></br><h3>&nbsp&nbspUnsere " + max + " Angebote für Sie</h3></head></br></br><body>");
+			out.println("<html><head><link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/"
+					+ "bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\""
+					+ " crossorigin=\"anonymous\"><title>Unsere " + max + " Angebote für Sie</title></br>&nbsp&nbsp&nbsp&nbsp"
+							+ "<a href=http://localhost:8080/CoolSolutions/Login>Anmelden</a>&nbsp&nbsp&nbsp&nbsp"
+							+ "<a href=http://localhost:8080/CoolSolutions/Register>Registrieren</a></br>"
+							+ "<h3>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+							+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+							+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+							+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+							+ "<u><b>CoolSolutions Online-Shop</b></u></h3></head><body>"
+							+ "<h4>&nbsp&nbsp&nbspUnsere " + max + " Angebote für Sie:</h4>");
 			
 			if(indexesOfEntities[0] == 0)
 			{
@@ -113,7 +123,7 @@ public class Angebote extends HttpServlet {
 					{
 					out.println("<form>");
 					out.println("<table class=table table-bordered>");
-					out.println("<tr class=\"info\"><td>" + rs.getString(2) + "<a href=http://localhost:8080/CoolSolutions/Template?id=" + rs.getString(1) + ">Details</a>" + "</td></tr>");
+					out.println("<tr class=\"info\"><td>&nbsp" + rs.getString(2) + "<a href=http://localhost:8080/CoolSolutions/Template?id=" + rs.getString(1) + ">Details</a>" + "</td></tr>");
 					out.println("<tr><td></td></tr>");
 					out.println("</table>");
 					out.println("</form>");
