@@ -2,6 +2,8 @@ package de.coolsolutions.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -128,6 +130,38 @@ public class Register extends HttpServlet {
 		String city = request.getParameter("city");
 		Integer cityId = null;	
 		String email = request.getParameter("email");
+		String password = request.getParameter("password");
+		String hash = "";
+		// Zufallsstring mit einer Laenge von 32 Zeichen erzeugen
+		String salt = "";
+		for(int i = 0; i < 32; i++){
+			// ASCII Code zwischen 48 (0) und 122 (z)
+			int randomInt = (int)(Math.random() * 74) + 48;
+			salt += (char) randomInt;			
+		}
+		
+		//String statSalt = "I;vmMppt6K>PtCCDf49fjLScRepl_CuC"; 
+		//String statHash = "‹á#yÝ¿¤&Ê½ÂâOùd—†Â‹å2GT)U"; 
+		System.out.println("SALT: " + salt);
+		
+		String saltedPassword = password + salt;
+		
+		MessageDigest md;
+		try
+		{
+			md = MessageDigest.getInstance("SHA-256");
+			md.update(saltedPassword.getBytes("UTF-8"));			
+			byte[] digest = md.digest();
+			hash = new String(digest);
+		}
+		catch (NoSuchAlgorithmException e1)
+		{
+			e1.printStackTrace();
+		}
+
+		System.out.println("HASH: " + hash);
+		
+		//String hash = "";
 		
 		// DB Connection
 		Connection conn = null;
@@ -160,23 +194,21 @@ public class Register extends HttpServlet {
 			
 			
 			// Kunden in DB eintragen
-//			SQL = "INSERT INTO Kunde (Name, Vorname, Strasse, Strassennummer, E_Mail, Ort_ID, Geschlecht) ";
-//			SQL += "VALUES (N'" + lastname + "', N'" + surname + "', N'" + street + "', N'" + streetnumber + "', N'" + email + "', " + cityId + ", N'" + gender + "')";
-
-			INS = "INSERT INTO Kunde (Name, Vorname, Strasse, Strassennummer, E_Mail, Ort_ID, Geschlecht) ";
+			INS = "INSERT INTO Kunde (Name, Vorname, Strasse, Strassennummer, E_Mail, Ort_ID, Geschlecht, Salt) ";
 			INS += "VALUES (";
 			INS += "N'" + lastname + "'";
 			INS += ", N'" + surname + "'";
 			INS += ", N'" + street + "'";
 			INS += ", N'" + streetnumber + "'";
 			INS += ", N'" + email + "'";
-			INS += ", N'" + cityId + "'";
-			INS += ", N'" + gender + "')";
+			INS += ", " + cityId;
+			INS += ", N'" + gender + "'";
+			INS += ", N'" + salt + "')";
 			
-			int anzahl = stmt.executeUpdate(INS);			
+			//int ins_rows = stmt.executeUpdate(INS);			
 			// TODO - bei anzahl != 1 reagieren
 			
-			System.out.println(anzahl);
+			//System.out.println(ins_rows);
 		}
 
 		catch (Exception e)
@@ -212,11 +244,13 @@ public class Register extends HttpServlet {
 				}
 		}
 		
+		
+		
 		//Customer cust = new Customer(gender, surname, lastname, street, streetnumber, cityId, email);
 
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		out.println("<html><head></head><body>..doPost: " + cityId + "</body></html>");
+//		response.setContentType("text/html");
+//		PrintWriter out = response.getWriter();
+//		out.println("<html><head></head><body>..doPost: " + cityId + "</body></html>");
 		
 	}
 
