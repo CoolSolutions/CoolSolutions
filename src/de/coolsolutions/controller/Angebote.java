@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.naming.InitialContext;
 import javax.servlet.ServletException;
@@ -38,6 +40,10 @@ public class Angebote extends HttpServlet {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
+//		HttpSession session = request.getSession();
+//		int customer_ID = (int)(session.getAttribute("id"));
+		
+		int customer_ID = 0;
 		
 		response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();	 
@@ -93,39 +99,224 @@ public class Angebote extends HttpServlet {
 				
 			}
 			
-			out.println("<html><head><link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/"
-					+ "bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\""
-					+ " crossorigin=\"anonymous\"><title>Unsere " + max + " Angebote f�r Sie</title></br>&nbsp&nbsp&nbsp&nbsp"
-							+ "<a href=http://localhost:8080/CoolSolutions/Login>Anmelden</a>&nbsp&nbsp&nbsp&nbsp"
-							+ "<a href=http://localhost:8080/CoolSolutions/Register>Registrieren</a></br>"
-							+ "<h3>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-							+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-							+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-							+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-							+ "<u><b>CoolSolutions Online-Shop</b></u></h3></head><body>"
-							+ "<h4>&nbsp&nbsp&nbspUnsere " + max + " Angebote f�r Sie:</h4>");
-			
-			if(indexesOfEntities[0] == 0)
+			if(customer_ID == 0)
 			{
-				out.println("Keine Angebote vorhanden!");
+				out.println("<html><head><link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/"
+						+ "bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\""
+						+ " crossorigin=\"anonymous\"><title>Unsere " + max + " Angebote für Sie</title></br>&nbsp&nbsp&nbsp&nbsp"
+								+ "<a href=http://localhost:8080/CoolSolutions/Login>Anmelden</a>&nbsp&nbsp&nbsp&nbsp"
+								+ "<a href=http://localhost:8080/CoolSolutions/Register>Registrieren</a></br>"
+								+ "<h2>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+								+ "<b>CoolSolutions Online-Shop</b></h2></head><body>"
+								+ "<h4>&nbsp&nbsp&nbspUnsere " + max + " Angebote für Sie:</h4>");
+				
+				if(indexesOfEntities[0] == 0)
+				{
+					out.println("Keine Angebote vorhanden!");
+				}
+				else
+				{
+					for(int in : indexesOfEntities)
+					{	
+					
+						SQL = "SELECT ID,Name FROM Artikel WHERE ID=" + in;
+						stmt = conn.createStatement();
+						rs = stmt.executeQuery(SQL);
+		
+						if(rs.next())
+						{
+						out.println("<form>");
+						out.println("<table class=table table-bordered>");
+						out.println("<tr class=\"info\"><td>&nbsp" + rs.getString(2) + "<a href=http://localhost:8080/CoolSolutions/Template?id=" + rs.getString(1) + ">Details</a>" + "</td></tr>");
+						out.println("<tr><td></td></tr>");
+						out.println("</table>");
+						out.println("</form>");
+						}
+					}
+				}
 			}
 			else
 			{
-				for(int in : indexesOfEntities)
-				{	
+				// Artikelgruppen auslesen
+				ArrayList<String> listOfGroups = new ArrayList<>();
+				int TotalNumberOfAllGroups = 0;
+				SQL = "SELECT ID FROM Artikelgruppe";
+				stmt = conn.createStatement();
+				rs = stmt.executeQuery(SQL);
 				
-					SQL = "SELECT ID,Name FROM Artikel WHERE ID=" + in;
+				// Alle existierenden Artikelgruppen speichern
+				while(rs.next())
+				{
+					listOfGroups.add(rs.getString(1));
+				}
+				TotalNumberOfAllGroups = listOfGroups.size();
+				
+				// Pruefen, welche Artikelgruppen der Kunde schon bestellt hat
+				SQL = "SELECT Artikelgruppe.ID FROM Kunde INNER JOIN Bestellung ON Kunde.ID = Bestellung.Kunde_ID INNER JOIN Bestelldetails ON Bestellung.ID = Bestelldetails.Bestellung_ID INNER JOIN Artikel ON Bestelldetails.Artikel_ID = Artikel.ID INNER JOIN Artikelgruppe ON Artikel.Artikelgruppe_ID = Artikelgruppe.ID WHERE Kunde_ID=" + customer_ID;
+				stmt = conn.createStatement();
+				rs = stmt.executeQuery(SQL);
+				
+				HashSet<String> alreadyOrdered = new HashSet<>();
+				
+				// Die Artikelgruppen, die schon bestellt wurden, in einer ArrayList<String> speichern
+				// (Keine doppelten Eintraeg, daher HashSet)
+				while(rs.next())
+				{
+					alreadyOrdered.add(rs.getString(1));
+				}
+				// Aus HashSet eine ArrayList machen
+				ArrayList<String> alreadyOrderedAsArrayList = new ArrayList<>();
+				Object [] alreadyOrderedAsArray = alreadyOrdered.toArray();
+				for(Object value : alreadyOrderedAsArray)
+				{
+					alreadyOrderedAsArrayList.add(value.toString());
+				}
+				
+				/* dem Kunden Artikel aus anderen Kategorien anbieten */
+				// Kundennamen auslesen
+				SQL = "SELECT Kunde.Name, Kunde.Vorname FROM Kunde WHERE Kunde.ID=" + customer_ID;
+				stmt = conn.createStatement();
+				rs = stmt.executeQuery(SQL);
+			
+				String userFirstname = "";
+				String userLastname = "";
+				while(rs.next())
+				{
+					userFirstname = rs.getString(1);
+					userLastname = rs.getString(2);
+				}
+				
+				// AUSGABE
+//				out.println("</br>listOfGroups: ");
+//				for(String groupNumber : listOfGroups)
+//				{
+//					out.println(groupNumber + ", ");
+//				}
+//				out.println("</br>alreadyOrdered: ");
+//				for(String groupNumber : alreadyOrdered)
+//				{
+//					out.println(groupNumber + ", ");
+//				}
+				// ENDE AUSGABE
+				
+				// Die Artikelgruppen, die schon bestellt wurden, ausschliessen
+				for(int ordered = 0; ordered < alreadyOrdered.size(); ordered++)
+				{
+					if(listOfGroups.contains(alreadyOrderedAsArrayList.get(ordered)))
+					{
+						listOfGroups.remove(alreadyOrderedAsArrayList.get(ordered));
+					}
+				}
+
+				out.println("<html><head><link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/"
+						+ "bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\""
+						+ " crossorigin=\"anonymous\"><title>Das könnte Sie interessieren</title></br>&nbsp&nbsp&nbsp&nbsp"
+								+ "Angemeldet als " + userFirstname + userLastname + "&nbsp&nbsp&nbsp&nbsp"
+								+ "<a href=http://localhost:8080/CoolSolutions/Angebote?id=0>Abmelden</a>&nbsp&nbsp&nbsp&nbsp"
+								+ "<h2>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+								+ "<b>CoolSolutions Online-Shop</b></h2></head><body>"
+								+ "<h4>&nbsp&nbsp&nbspDas könnte Sie interessieren</h4>");
+				
+				// AUSGABE
+//				out.println("</br>listOfGroups: ");
+//				for(String groupNumber : listOfGroups)
+//				{
+//					out.println(groupNumber + ", ");
+//				}
+//				out.println("</br>alreadyOrdered: ");
+//				for(String groupNumber : alreadyOrdered)
+//				{
+//					out.println(groupNumber + ", ");
+//				}
+				// ENDE AUSGABE
+				
+				
+				
+				/* Artikel aus jeder Artikelgruppe ausgegeben, */
+				/* aus der der Kunde noch nichts bestellt hat. */
+				
+				// Artikel aus max. 5 verschieden (beliebigen) Artikelgruppen anbieten
+				ArrayList<Integer> showedGroup = new ArrayList<>();
+				for(int numberOfGroups = 0; numberOfGroups < listOfGroups.size() && numberOfGroups < 5; numberOfGroups++)
+				{
+					
+//					out.println("</br>listOfGroups.size(): " + listOfGroups.size());
+//					out.println("</br>numberOfGroups: " + numberOfGroups);
+//					out.println("</br>alreadyOrderedAsArrayList.size(): " + alreadyOrderedAsArrayList.size());
+					// Beliebige Artikelgruppe auswaehlen
+					int groupIndex = 0;
+					if(listOfGroups.size() == 1)
+					{
+						groupIndex = 0;
+					}
+					else
+					{
+						groupIndex = ( (int)(Math.random()*(listOfGroups.size())) );
+					}
+					
+//					out.println("</br>groupIndex: " + groupIndex); // TEST
+//					out.println("</br>listOfGroups.get(groupIndex): " + listOfGroups.get(groupIndex)); // TEST
+					SQL = "SELECT Name, ID FROM Artikel WHERE Artikelgruppe_ID =" + listOfGroups.get(groupIndex);
 					stmt = conn.createStatement();
 					rs = stmt.executeQuery(SQL);
-	
-					if(rs.next())
+					
+					// Anzahl der Artikel in der Artikelruppe bestimmen und anspeichern
+					int numberOfArticles = 0;
+					while(rs.next())
 					{
-					out.println("<form>");
-					out.println("<table class=table table-bordered>");
-					out.println("<tr class=\"info\"><td>&nbsp" + rs.getString(2) + "<a href=http://localhost:8080/CoolSolutions/Template?id=" + rs.getString(1) + ">Details</a>" + "</td></tr>");
-					out.println("<tr><td></td></tr>");
-					out.println("</table>");
-					out.println("</form>");
+						numberOfArticles++;
+					}
+					
+					SQL = "SELECT Name, ID FROM Artikel WHERE Artikelgruppe_ID =" + listOfGroups.get(groupIndex);
+					stmt = conn.createStatement();
+					rs = stmt.executeQuery(SQL);
+					
+					
+					int articleNumber = ( (int)(Math.random()*(numberOfArticles)) + 1 );
+//					out.println("</br>numberOfArticles: " + numberOfArticles);
+//					out.println("</br>groupNumber: " + groupNumber);
+//					out.println("</br>listOfGroups.size(): " + listOfGroups.size());
+//					out.println("</br>listOfGroups.get(0): " + listOfGroups.get(0));
+//					out.println("</br>articleNumber: " + articleNumber);
+					
+					// Pruefen, ob ein Artikel aus dieser Artikelgruppe schon angezeigt wurde
+					boolean notYetShowed = true;
+					//if(showedGroup != null && showedArticle != null)
+					if(showedGroup != null)
+					{
+						for(int in = 0; in < showedGroup.size(); in++)
+						{
+							if(showedGroup.get(in) == Integer.parseInt(listOfGroups.get(groupIndex)))
+							{
+								notYetShowed = false;
+								numberOfGroups--;
+							}
+						}
+					}
+					// ENDE der Pruefung
+					
+					if(notYetShowed)
+					{
+						showedGroup.add(Integer.parseInt(listOfGroups.get(groupIndex)));
+	
+						for(int index = 1; index <= numberOfArticles && rs.next(); index++)
+						{
+							if(index == articleNumber)
+							{
+								out.println("<form>");
+								out.println("<table class=table table-bordered>");
+								out.println("<tr class=\"info\"><td>&nbsp" + rs.getString(1) + "<a href=http://localhost:8080/CoolSolutions/Template?id=" + rs.getString(2) + ">Details</a>" + "</td></tr>");
+								out.println("<tr><td></td></tr>");
+								out.println("</table>");
+								out.println("</form>");
+							}
+						}
 					}
 				}
 			}
