@@ -2,9 +2,13 @@ package de.coolsolutions.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Base64;
 
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
@@ -34,40 +38,12 @@ public class LoginProcessing extends HttpServlet
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 
-		/*
-		 * if(request.getAttribute("faultyInsertion") != null &&
-		 * request.getAttribute("faultyInsertion").equals("city")){
-		 * request.setAttribute("faultyInsertion", "city");
-		 * System.out.println("DOGET wird aufgerufen"); doGet(request,
-		 * response); }
-		 */
-
 		Integer id = null;
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
-		String hash = "";
+		String rem_hash = "";
+		String loc_hash = "";
 		String salt = "";
-
-		// BEISPIEL: Hash Ergebnis bei folgenden, konstanten Passwort- und
-		// Saltwerten
-		// String Cpass = "passwort";
-		// String Csalt = "JW5lY[OFFc7XHd>]Xnti=i[T1EwS:_7b";
-		// String Chash = "8AU1mhs4q39l8tHXCnTohfBzAW8+rts4wy2+WbRAub4=";
-		// System.out.println("SALT: " + salt);
-
-		/*String saltedPassword = password + salt;
-
-		try
-		{
-			MessageDigest digest = MessageDigest.getInstance("SHA-256");
-			byte[] byteHash = digest.digest(saltedPassword.getBytes(StandardCharsets.UTF_8));
-			hash = Base64.getEncoder().encodeToString(byteHash);
-		} catch (NoSuchAlgorithmException e1)
-		{
-			e1.printStackTrace();
-		}*/
-
-		// System.out.println("HASH: " + hash);
 
 		// DB Connection
 		Connection conn = null;
@@ -96,8 +72,31 @@ public class LoginProcessing extends HttpServlet
 			if (rs.next())
 			{
 				id = rs.getInt(1);
-				hash = rs.getString(2);
-				salt = rs.getString(3);				
+				rem_hash = rs.getString(2);
+				salt = rs.getString(3);
+
+				String saltedPassword = password + salt;
+
+				try
+				{
+					MessageDigest digest = MessageDigest.getInstance("SHA-256");
+					byte[] byteHash = digest.digest(saltedPassword.getBytes(StandardCharsets.UTF_8));
+					loc_hash = Base64.getEncoder().encodeToString(byteHash);
+				} catch (NoSuchAlgorithmException e1)
+				{
+					e1.printStackTrace();
+				}
+				
+				System.out.println(loc_hash + "LOCAL HASH");
+				System.out.println(rem_hash + "REMOTE HASH");
+				
+				if(loc_hash.equals(rem_hash)){
+					System.out.println("EINGELOGGT");
+				}
+				else{
+					System.out.println("LOGIN VERWEIGERT");
+				}
+					
 			} 
 			else
 			{
@@ -140,9 +139,6 @@ public class LoginProcessing extends HttpServlet
 				{
 				}
 		}
-
-		// Customer cust = new Customer(gender, surname, lastname, street,
-		// streetnumber, cityId, email);
 
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
