@@ -21,7 +21,7 @@ public class Login extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	    response.setContentType("text/html");
-	    PrintWriter out = response.getWriter();	    
+	    PrintWriter out = response.getWriter();
 	    
 	    out.println("<html lang=\"en\">");
 	    out.println("<head>");
@@ -31,14 +31,18 @@ public class Login extends HttpServlet {
 		out.println("</head>");
 		out.println("<body>");
 		out.println("<div class=\"container\">");
-		out.println("<form class=\"form-signin\">");
+		out.println("<form class=\"form-signin\" action=\"/CoolSolutions/LoginProcessing\" method=\"POST\">");
 		out.println("<h2 class=\"form-signin-heading\" style=\"text-align: center\">Bitte melden Sie sich an</h2>");
+	    
+		if(request.getAttribute("faultyInsertion") != null){
+	    	out.println("<h2>" + request.getAttribute("faultyInsertion") + "</h2>");
+	    }
 		out.println("<br />");
 		out.println("<label for=\"inputEmail\" class=\"sr-only\">E-Mail</label>");
-		out.println("<input type=\"email\" id=\"inputEmail\" class=\"form-control\" placeholder=\"E-Mail\" required autofocus>");
+		out.println("<input type=\"email\" name=\"email\" id=\"inputEmail\" class=\"form-control\" placeholder=\"E-Mail\" required autofocus>");
 		out.println("<br />");
 		out.println("<label for=\"inputPassword\" class=\"sr-only\">Passwort</label>");
-		out.println("<input type=\"password\" id=\"inputPassword\" class=\"form-control\" placeholder=\"Passwort\" required>");
+		out.println("<input type=\"password\" name=\"password\" id=\"inputPassword\" class=\"form-control\" placeholder=\"Passwort\" required>");
 		out.println("<br />");
 		out.println("<button class=\"btn btn-lg btn-primary btn-block\" type=\"submit\">Anmelden</button>");
 		out.println("</form>");
@@ -52,7 +56,6 @@ public class Login extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

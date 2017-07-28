@@ -1,0 +1,153 @@
+package de.coolsolutions.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+import javax.naming.InitialContext;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
+/**
+ * Servlet implementation class Register
+ */
+@WebServlet("/LoginProcessing")
+public class LoginProcessing extends HttpServlet
+{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8612797131703313939L;
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
+
+		/*
+		 * if(request.getAttribute("faultyInsertion") != null &&
+		 * request.getAttribute("faultyInsertion").equals("city")){
+		 * request.setAttribute("faultyInsertion", "city");
+		 * System.out.println("DOGET wird aufgerufen"); doGet(request,
+		 * response); }
+		 */
+
+		Integer id = null;
+		String email = request.getParameter("email");
+		String password = request.getParameter("password");
+		String hash = "";
+		String salt = "";
+
+		// BEISPIEL: Hash Ergebnis bei folgenden, konstanten Passwort- und
+		// Saltwerten
+		// String Cpass = "passwort";
+		// String Csalt = "JW5lY[OFFc7XHd>]Xnti=i[T1EwS:_7b";
+		// String Chash = "8AU1mhs4q39l8tHXCnTohfBzAW8+rts4wy2+WbRAub4=";
+		// System.out.println("SALT: " + salt);
+
+		/*String saltedPassword = password + salt;
+
+		try
+		{
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] byteHash = digest.digest(saltedPassword.getBytes(StandardCharsets.UTF_8));
+			hash = Base64.getEncoder().encodeToString(byteHash);
+		} catch (NoSuchAlgorithmException e1)
+		{
+			e1.printStackTrace();
+		}*/
+
+		// System.out.println("HASH: " + hash);
+
+		// DB Connection
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+
+		String resourcename = "java:comp/env/jdbc/coolsolutions";
+		DataSource ds = null;
+
+		String SEL = "";
+		String INS = "";
+
+		try
+		{
+			InitialContext jndiCntx = new InitialContext();
+			ds = (DataSource) jndiCntx.lookup(resourcename);
+
+			conn = ds.getConnection();
+
+			// Ort-ID ermitteln
+			SEL = "SELECT ID, Hash, Salt FROM Kunde WHERE E_Mail = '" + email + "'";
+
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(SEL);
+
+			if (rs.next())
+			{
+				id = rs.getInt(1);
+				hash = rs.getString(2);
+				salt = rs.getString(3);				
+			} 
+			else
+			{
+				RequestDispatcher rd;
+				rd = getServletContext().getRequestDispatcher("/Login");
+				//System.out.println("WEITERLEITUNG");
+				request.setAttribute("faultyInsertion", "mail");
+				rd.forward(request, response);
+				return;
+			}
+
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		finally
+		{
+			if (rs != null)
+				try
+				{
+					rs.close();
+				} catch (Exception e)
+				{
+				}
+			if (stmt != null)
+				try
+				{
+					stmt.close();
+				} catch (Exception e)
+				{
+				}
+			if (conn != null)
+				try
+				{
+					conn.close();
+				} catch (Exception e)
+				{
+				}
+		}
+
+		// Customer cust = new Customer(gender, surname, lastname, street,
+		// streetnumber, cityId, email);
+
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+		out.println("<html><head></head><body>DANKE FÜR DIE ANMELDUNG</body></html>");
+
+	}
+
+}
