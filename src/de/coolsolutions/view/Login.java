@@ -3,6 +3,7 @@ package de.coolsolutions.view;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -25,14 +26,11 @@ public class Login extends HttpServlet {
 		response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();
 	    
-	    out.println("<html lang=\"en\">");
-	    out.println("<head>");
-		out.println("<meta charset=\"utf-8\">");
-		out.println("<title>CoolSolutions Login</title>");
-		out.println("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">");
-		out.println("<link rel=\"stylesheet\" href=\"css/styles.css\"");		
-		out.println("</head>");
-		out.println("<body>");
+	    // Header einbinden
+		RequestDispatcher rd; 
+		rd = getServletContext().getRequestDispatcher("/Header"); 
+		rd.include(request, response);
+		
 		out.println("<div class=\"container\">");
 		out.println("<form class=\"form-signin\" action=\"/CoolSolutions/LoginProcessing\" method=\"POST\">");
 		out.println("<h2 class=\"form-signin-heading\" style=\"text-align: center\">Bitte melden Sie sich an</h2>");

@@ -17,4 +17,17 @@ li.city {
     background-image:url('../images/world.svg');
     background-repeat:no-repeat;
     background-position:left center;
-} 
+}
+
+.logo{
+	padding-top: 20px;
+	padding-left: 20px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 150px;
+}
+
+.header{
+	height: 80px;
+}
