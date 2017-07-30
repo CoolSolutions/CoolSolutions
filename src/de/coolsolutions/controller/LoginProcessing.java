@@ -89,8 +89,8 @@ public class LoginProcessing extends HttpServlet
 					e1.printStackTrace();
 				}
 				
-				System.out.println(loc_hash + "LOCAL HASH");
-				System.out.println(rem_hash + "REMOTE HASH");
+				//System.out.println(loc_hash + "LOCAL HASH");
+				//System.out.println(rem_hash + "REMOTE HASH");
 				
 				if(!loc_hash.equals(rem_hash)){
 					request.setAttribute("email", email);

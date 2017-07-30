@@ -200,7 +200,7 @@ public class RegisterProcessing extends HttpServlet
 		}
 		else
 		{
-			System.out.println("PROCESSING OK");
+			//System.out.println("PROCESSING OK");
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
 			out.println("<html><head></head><body>VIELEN DANK FÜR DIE REGISTRIERUNG</body></html>");
