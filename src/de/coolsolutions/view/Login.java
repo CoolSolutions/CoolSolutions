@@ -21,7 +21,6 @@ public class Login extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	    String emailValue = "";
-	    boolean retry = false;
 		
 		response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();
@@ -39,7 +38,6 @@ public class Login extends HttpServlet {
 		out.println("<h2 class=\"form-signin-heading\" style=\"text-align: center\">Bitte melden Sie sich an</h2>");
 		
 		if(request.getAttribute("faultyInsertion") != null){
-			retry = true;
 			out.println("<div class=\"bg-danger\" style=\"padding-top:15px; padding-bottom:5px; text-align:center; font-size:16px\"><ul>");
 			if(request.getAttribute("faultyInsertion").equals("mail")){
 				out.println("<li class=\"mail\">Diese E-Mail Adresse ist nicht vorhanden</li>");
@@ -56,7 +54,7 @@ public class Login extends HttpServlet {
 			emailValue = (String) request.getAttribute("email");
 		}
 		out.print("<input type=\"email\" name=\"email\" id=\"inputEmail\" value=\"" + emailValue + "\" class=\"form-control\" placeholder=\"E-Mail\" required ");
-		if(!retry){ out.print("autofocus"); }
+		if(request.getAttribute("faultyInsertion") == null){ out.print("autofocus"); }
 		out.println(">");
 		out.println("<br />");
 		out.println("<label for=\"inputPassword\" class=\"sr-only\">Passwort</label>");

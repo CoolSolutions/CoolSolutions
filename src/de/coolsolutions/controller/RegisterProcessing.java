@@ -38,14 +38,7 @@ public class RegisterProcessing extends HttpServlet
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 
-		/*
-		 * if(request.getAttribute("faultyInsertion") != null &&
-		 * request.getAttribute("faultyInsertion").equals("city")){
-		 * request.setAttribute("faultyInsertion", "city");
-		 * System.out.println("DOGET wird aufgerufen"); doGet(request,
-		 * response); }
-		 */
-
+		boolean faultyInsertion = false;
 		String gender = request.getParameter("gender");
 		String surname = request.getParameter("surname");
 		String lastname = request.getParameter("lastname");
@@ -95,7 +88,8 @@ public class RegisterProcessing extends HttpServlet
 		String resourcename = "java:comp/env/jdbc/coolsolutions";
 		DataSource ds = null;
 
-		String SEL = "";
+		String SEL_CITY = "";
+		String SEL_MAIL = "";
 		String INS = "";
 
 		try
@@ -104,47 +98,56 @@ public class RegisterProcessing extends HttpServlet
 			ds = (DataSource) jndiCntx.lookup(resourcename);
 
 			conn = ds.getConnection();
-
-			// Ort-ID ermitteln
-			SEL = "SELECT ID FROM Ort WHERE Ort = '" + city + "' AND PLZ = " + zipcode;
-
 			stmt = conn.createStatement();
-			rs = stmt.executeQuery(SEL);
+			
+			// Ort-ID ermitteln
+			SEL_CITY = "SELECT ID FROM Ort WHERE Ort = '" + city + "' AND PLZ = '" + zipcode + "'";
+			rs = stmt.executeQuery(SEL_CITY);
 
 			if (rs.next())
 			{
 				cityId = rs.getInt(1);
+				rs.close();
+				//System.out.println("CITY AND ZIP OK");
 			} 
 			else
 			{
-				RequestDispatcher rd;
-				rd = getServletContext().getRequestDispatcher("/Register");
-				//System.out.println("WEITERLEITUNG");
-				request.setAttribute("faultyInsertion", "city");
-				rd.forward(request, response);
-				return;
+				faultyInsertion = true;
+				request.setAttribute("unknownCity", "true");
+				rs.close();
+				//System.out.println("CITY AND ZIP NOT OK");
 			}
-			// TODO - Auf Falscheingabe reagieren
-
-			//System.out.println("INSERT INTO");
+			
+			// Auf bereits existierende E-Mail Adresse prüfen
+			SEL_MAIL = "SELECT ID FROM Kunde WHERE E_Mail = '" + email + "'";
+			rs = stmt.executeQuery(SEL_MAIL);
+			if (rs.next())
+			{
+				faultyInsertion = true;
+				request.setAttribute("emailAlreadyExisting", "true");
+				//System.out.println("MAIL ALREADY TAKEN");
+			} 
+			
 			// Kunden in DB eintragen
-			INS = "INSERT INTO Kunde (Name, Vorname, Strasse, Strassennummer, E_Mail, Ort_ID, Geschlecht, Hash, Salt) ";
-			INS += "VALUES (";
-			INS += "N'" + lastname + "'";
-			INS += ", N'" + surname + "'";
-			INS += ", N'" + street + "'";
-			INS += ", N'" + streetnumber + "'";
-			INS += ", N'" + email + "'";
-			INS += ", " + cityId;
-			INS += ", N'" + gender + "'";
-			INS += ", N'" + hash + "'";
-			INS += ", N'" + salt + "')";
+			if(!faultyInsertion)
+			{
+				//System.out.println("START INSERT");
+				INS = "INSERT INTO Kunde (Name, Vorname, Strasse, Strassennummer, E_Mail, Ort_ID, Geschlecht, Hash, Salt) ";
+				INS += "VALUES (";
+				INS += "N'" + lastname + "'";
+				INS += ", N'" + surname + "'";
+				INS += ", N'" + street + "'";
+				INS += ", N'" + streetnumber + "'";
+				INS += ", N'" + email + "'";
+				INS += ", " + cityId;
+				INS += ", N'" + gender + "'";
+				INS += ", N'" + hash + "'";
+				INS += ", N'" + salt + "')";
 
-			int ins_rows = stmt.executeUpdate(INS);
-			// TODO - bei anzahl != 1 reagieren
+				int ins_rows = stmt.executeUpdate(INS);
+				// TODO - bei anzahl != 1 reagieren
+			}
 
-			// TODO - sysout entfernen
-			//System.out.println(ins_rows);
 		}
 
 		catch (Exception e)
@@ -177,12 +180,31 @@ public class RegisterProcessing extends HttpServlet
 				}
 		}
 
-		// Customer cust = new Customer(gender, surname, lastname, street,
-		// streetnumber, cityId, email);
-
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		out.println("<html><head></head><body>DANKE FÜR DIE REGISTRIERUNG</body></html>");
+		if(faultyInsertion)
+		{	
+			//System.out.println("FAULTY REDIRECT WITH ZIP: " + zipcode);
+			RequestDispatcher rd;
+			rd = getServletContext().getRequestDispatcher("/Register");
+			request.setAttribute("faultyInsertion", "true");
+			request.setAttribute("gender", gender);
+			request.setAttribute("surname", surname);
+			request.setAttribute("lastname", lastname);
+			request.setAttribute("street", street);
+			request.setAttribute("streetnumber", streetnumber);
+			request.setAttribute("zipcode", zipcode);
+			request.setAttribute("city", city);
+			request.setAttribute("email", email);
+			request.setAttribute("password", password);
+			rd.forward(request, response);
+			return;
+		}
+		else
+		{
+			System.out.println("PROCESSING OK");
+			response.setContentType("text/html");
+			PrintWriter out = response.getWriter();
+			out.println("<html><head></head><body>VIELEN DANK FÜR DIE REGISTRIERUNG</body></html>");
+		}
 
 	}
 

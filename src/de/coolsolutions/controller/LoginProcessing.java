@@ -143,7 +143,6 @@ public class LoginProcessing extends HttpServlet
 		{
 			RequestDispatcher rd;
 			rd = getServletContext().getRequestDispatcher("/Login");
-			//System.out.println("WEITERLEITUNG");
 			request.setAttribute("faultyInsertion", faultyInsertion);
 			rd.forward(request, response);
 			return;

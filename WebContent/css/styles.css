@@ -10,4 +10,11 @@ li.password {
     background-image:url('../images/password.svg');
     background-repeat:no-repeat;
     background-position:left center;
+}
+
+li.city {
+    list-style-type: none;
+    background-image:url('../images/world.svg');
+    background-repeat:no-repeat;
+    background-position:left center;
 } 
