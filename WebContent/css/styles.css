@@ -3,6 +3,7 @@ li.mail {
     background-image:url('../images/mail.svg');
     background-repeat:no-repeat;
     background-position:left center;
+    margin-bottom: 5px;
 }
 
 li.password {
@@ -10,6 +11,7 @@ li.password {
     background-image:url('../images/password.svg');
     background-repeat:no-repeat;
     background-position:left center;
+    margin-bottom: 5px;
 }
 
 li.city {
@@ -17,6 +19,7 @@ li.city {
     background-image:url('../images/world.svg');
     background-repeat:no-repeat;
     background-position:left center;
+    margin-bottom: 5px;
 }
 
 .logo{
