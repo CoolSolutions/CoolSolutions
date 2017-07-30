@@ -48,11 +48,10 @@ public class Register extends HttpServlet
 		out.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
 		out.println("<title>CoolSolutions Registrierung</title>");
 		out.println("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">");
-		out.println("<link rel=\"stylesheet\" href=\"css/styles.css\"");
+		out.println("<link rel=\"stylesheet\" href=\"css/styles.css\">");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<div class=\"header\"><img class=\"logo\" src=\"images/logo.png\"></div>");
-
+		out.println("<div class=\"header\"><a href=\" " + response.encodeURL("/CoolSolutions/") + "\"><img class=\"logo\" src=\"images/logo.png\"></a></div>");
 		out.println("<div class=\"container\">");
 		out.println("<form class=\"form-horizontal\" action=\"/CoolSolutions/RegisterProcessing\" method=\"POST\">");
 		out.println("<h2 class=\"form-signin-heading\" style=\"text-align: center\">Bitte geben Sie Ihre Daten ein</h2>");
