@@ -1,0 +1,13 @@
+li.mail {
+    list-style-type: none;
+    background-image:url('../images/mail.svg');
+    background-repeat:no-repeat;
+    background-position:left center;
+}
+
+li.password {
+    list-style-type: none;
+    background-image:url('../images/password.svg');
+    background-repeat:no-repeat;
+    background-position:left center;
+} 

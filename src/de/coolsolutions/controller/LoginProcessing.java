@@ -17,6 +17,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 /**
@@ -44,6 +45,7 @@ public class LoginProcessing extends HttpServlet
 		String rem_hash = "";
 		String loc_hash = "";
 		String salt = "";
+		String faultyInsertion = null;
 
 		// DB Connection
 		Connection conn = null;
@@ -90,22 +92,19 @@ public class LoginProcessing extends HttpServlet
 				System.out.println(loc_hash + "LOCAL HASH");
 				System.out.println(rem_hash + "REMOTE HASH");
 				
-				if(loc_hash.equals(rem_hash)){
-					System.out.println("EINGELOGGT");
+				if(!loc_hash.equals(rem_hash)){
+					request.setAttribute("email", email);
+					faultyInsertion = "password";
 				}
 				else{
-					System.out.println("LOGIN VERWEIGERT");
+					HttpSession session = request.getSession();
+					session.setAttribute("userID", id);
 				}
 					
 			} 
 			else
 			{
-				RequestDispatcher rd;
-				rd = getServletContext().getRequestDispatcher("/Login");
-				//System.out.println("WEITERLEITUNG");
-				request.setAttribute("faultyInsertion", "mail");
-				rd.forward(request, response);
-				return;
+				faultyInsertion = "mail";
 			}
 
 		}
@@ -139,10 +138,20 @@ public class LoginProcessing extends HttpServlet
 				{
 				}
 		}
-
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		out.println("<html><head></head><body>DANKE FÜR DIE ANMELDUNG</body></html>");
+		
+		if(faultyInsertion != null)
+		{
+			RequestDispatcher rd;
+			rd = getServletContext().getRequestDispatcher("/Login");
+			//System.out.println("WEITERLEITUNG");
+			request.setAttribute("faultyInsertion", faultyInsertion);
+			rd.forward(request, response);
+			return;
+		}
+		else
+		{
+			response.sendRedirect(response.encodeRedirectURL("/CoolSolutions/Angebote"));
+		}
 
 	}
 

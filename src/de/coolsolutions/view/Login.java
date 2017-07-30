@@ -1,4 +1,4 @@
-package de.coolsolutions.controller;
+package de.coolsolutions.view;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,7 +20,10 @@ public class Login extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    response.setContentType("text/html");
+	    String emailValue = "";
+	    boolean retry = false;
+		
+		response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();
 	    
 	    out.println("<html lang=\"en\">");
@@ -28,18 +31,33 @@ public class Login extends HttpServlet {
 		out.println("<meta charset=\"utf-8\">");
 		out.println("<title>CoolSolutions Login</title>");
 		out.println("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">");
+		out.println("<link rel=\"stylesheet\" href=\"css/styles.css\"");		
 		out.println("</head>");
 		out.println("<body>");
 		out.println("<div class=\"container\">");
 		out.println("<form class=\"form-signin\" action=\"/CoolSolutions/LoginProcessing\" method=\"POST\">");
 		out.println("<h2 class=\"form-signin-heading\" style=\"text-align: center\">Bitte melden Sie sich an</h2>");
-	    
+		
 		if(request.getAttribute("faultyInsertion") != null){
-	    	out.println("<h2>" + request.getAttribute("faultyInsertion") + "</h2>");
+			retry = true;
+			out.println("<div class=\"bg-danger\" style=\"padding-top:15px; padding-bottom:5px; text-align:center; font-size:16px\"><ul>");
+			if(request.getAttribute("faultyInsertion").equals("mail")){
+				out.println("<li class=\"mail\">Diese E-Mail Adresse ist nicht vorhanden</li>");
+			}
+			if(request.getAttribute("faultyInsertion").equals("password")){
+				out.println("<li class=\"password\">Bitte überprüfen Sie das Passwort</li>");
+			}			
+			out.println("</ul></div>");
 	    }
+		
 		out.println("<br />");
 		out.println("<label for=\"inputEmail\" class=\"sr-only\">E-Mail</label>");
-		out.println("<input type=\"email\" name=\"email\" id=\"inputEmail\" class=\"form-control\" placeholder=\"E-Mail\" required autofocus>");
+		if(request.getAttribute("email") != null){
+			emailValue = (String) request.getAttribute("email");
+		}
+		out.print("<input type=\"email\" name=\"email\" id=\"inputEmail\" value=\"" + emailValue + "\" class=\"form-control\" placeholder=\"E-Mail\" required ");
+		if(!retry){ out.print("autofocus"); }
+		out.println(">");
 		out.println("<br />");
 		out.println("<label for=\"inputPassword\" class=\"sr-only\">Passwort</label>");
 		out.println("<input type=\"password\" name=\"password\" id=\"inputPassword\" class=\"form-control\" placeholder=\"Passwort\" required>");
