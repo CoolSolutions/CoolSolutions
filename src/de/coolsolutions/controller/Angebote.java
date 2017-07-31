@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 /**
@@ -34,19 +35,45 @@ public class Angebote extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@SuppressWarnings("resource")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		 
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
-//		HttpSession session = request.getSession();
-//		int customer_ID = (int)(session.getAttribute("id"));
 		
-		int customer_ID = 0;
+		int customerID = 1;
+		int destroyID = 0;
+		
+		HttpSession session = request.getSession();
+		if(session.getAttribute("id") != null)
+		{	
+			customerID = (int)(session.getAttribute("id"));
+		}
+		if(session.getAttribute("destroy") != null)
+		{	
+			destroyID = (int)(session.getAttribute("destroy"));
+			if(destroyID == 1)
+			{
+				session.invalidate();
+				customerID = 0;
+			}
+		}
+		
+		// WENN NICHT ANGEMELDETER KUNDE -> SESSION ERSTELLEN UND WEITERREICHEN (an Template) 
+		// (nach "Abmelden" oder Browser schliessen Session beenden)
+		// WENN NICHT ANGEMELDETER KUNDE -> SESSION ERSTELLEN UND WEITERREICHEN (an Template) 
+		// (nach "Abmelden" oder Browser schliessen Session beenden)
+		// WENN NICHT ANGEMELDETER KUNDE -> SESSION ERSTELLEN UND WEITERREICHEN (an Template) 
+		// (nach "Abmelden" oder Browser schliessen Session beenden)
+		// WENN NICHT ANGEMELDETER KUNDE -> SESSION ERSTELLEN UND WEITERREICHEN (an Template) 
+		// (nach "Abmelden" oder Browser schliessen Session beenden)
 		
 		response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();	 
+	    
+	    // out.println("session: " + session);
 	    
 	    String resourcename = "java:comp/env/jdbc/coolsolutions";
 		DataSource ds = null;
@@ -96,23 +123,25 @@ public class Angebote extends HttpServlet {
 					i--;
 					counter = 0;
 				}
-				
 			}
 			
-			if(customer_ID == 0)
+			if(customerID == 0)
 			{
 				out.println("<html><head><link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/"
 						+ "bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\""
-						+ " crossorigin=\"anonymous\"><title>Unsere " + max + " Angebote für Sie</title></br>&nbsp&nbsp&nbsp&nbsp"
-								+ "<a href=http://localhost:8080/CoolSolutions/Login>Anmelden</a>&nbsp&nbsp&nbsp&nbsp"
-								+ "<a href=http://localhost:8080/CoolSolutions/Register>Registrieren</a></br>"
-								+ "<h2>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-								+ "<b>CoolSolutions Online-Shop</b></h2></head><body>"
-								+ "<h4>&nbsp&nbsp&nbspUnsere " + max + " Angebote für Sie:</h4>");
-				
+						+ " crossorigin=\"anonymous\"><title>Unsere " + max + " Angebote für Sie</title></br>&nbsp&nbsp&nbsp");
+				if(destroyID == 0)
+				{
+				out.println("<a href=http://localhost:8080/CoolSolutions/Login>Anmelden</a>&nbsp&nbsp&nbsp&nbsp"
+						+ "<a href=http://localhost:8080/CoolSolutions/Register>Registrieren</a></head></br>");
+				}
+				else
+				{
+					out.println("Abmeldung erfolgreich");
+					// destroyID = 0;
+				}
+				out.println("<body><h2 align=center><b>CoolSolutions Online-Shop</b></h2>"
+						+ "<h4>&nbsp&nbsp&nbspUnsere " + max + " Angebote für Sie:</h4>");
 				if(indexesOfEntities[0] == 0)
 				{
 					out.println("Keine Angebote vorhanden!");
@@ -130,7 +159,7 @@ public class Angebote extends HttpServlet {
 						{
 						out.println("<form>");
 						out.println("<table class=table table-bordered>");
-						out.println("<tr class=\"info\"><td>&nbsp" + rs.getString(2) + "<a href=http://localhost:8080/CoolSolutions/Template?id=" + rs.getString(1) + ">Details</a>" + "</td></tr>");
+						out.println("<tr class=\"info\"><td>&nbsp" + rs.getString(2) + "<a href=http://localhost:8080/CoolSolutions/Template?articleID=" + rs.getString(1) + ">Details</a>" + "</td></tr>");
 						out.println("<tr><td></td></tr>");
 						out.println("</table>");
 						out.println("</form>");
@@ -142,7 +171,6 @@ public class Angebote extends HttpServlet {
 			{
 				// Artikelgruppen auslesen
 				ArrayList<String> listOfGroups = new ArrayList<>();
-				int TotalNumberOfAllGroups = 0;
 				SQL = "SELECT ID FROM Artikelgruppe";
 				stmt = conn.createStatement();
 				rs = stmt.executeQuery(SQL);
@@ -152,10 +180,20 @@ public class Angebote extends HttpServlet {
 				{
 					listOfGroups.add(rs.getString(1));
 				}
-				TotalNumberOfAllGroups = listOfGroups.size();
+				
+				// Anzahl der Artikel im Warenkorb des Kunden auslesen
+				SQL = "SELECT Menge FROM Warenkorb WHERE Kunde_ID="+customerID;
+				stmt = conn.createStatement();
+				rs = stmt.executeQuery(SQL);
+				
+				int numberOfOrderedArticles = 0;
+				while(rs.next())
+				{
+					numberOfOrderedArticles += Integer.parseInt(rs.getString(1));
+				}
 				
 				// Pruefen, welche Artikelgruppen der Kunde schon bestellt hat
-				SQL = "SELECT Artikelgruppe.ID FROM Kunde INNER JOIN Bestellung ON Kunde.ID = Bestellung.Kunde_ID INNER JOIN Bestelldetails ON Bestellung.ID = Bestelldetails.Bestellung_ID INNER JOIN Artikel ON Bestelldetails.Artikel_ID = Artikel.ID INNER JOIN Artikelgruppe ON Artikel.Artikelgruppe_ID = Artikelgruppe.ID WHERE Kunde_ID=" + customer_ID;
+				SQL = "SELECT Artikelgruppe.ID FROM Kunde INNER JOIN Bestellung ON Kunde.ID = Bestellung.Kunde_ID INNER JOIN Bestelldetails ON Bestellung.ID = Bestelldetails.Bestellung_ID INNER JOIN Artikel ON Bestelldetails.Artikel_ID = Artikel.ID INNER JOIN Artikelgruppe ON Artikel.Artikelgruppe_ID = Artikelgruppe.ID WHERE Kunde_ID=" + customerID;
 				stmt = conn.createStatement();
 				rs = stmt.executeQuery(SQL);
 				
@@ -177,7 +215,7 @@ public class Angebote extends HttpServlet {
 				
 				/* dem Kunden Artikel aus anderen Kategorien anbieten */
 				// Kundennamen auslesen
-				SQL = "SELECT Kunde.Name, Kunde.Vorname FROM Kunde WHERE Kunde.ID=" + customer_ID;
+				SQL = "SELECT Kunde.Name, Kunde.Vorname FROM Kunde WHERE Kunde.ID=" + customerID;
 				stmt = conn.createStatement();
 				rs = stmt.executeQuery(SQL);
 			
@@ -203,6 +241,13 @@ public class Angebote extends HttpServlet {
 				// ENDE AUSGABE
 				
 				// Die Artikelgruppen, die schon bestellt wurden, ausschliessen
+				
+				//WENN KUNDE ANGEMELDET, SEINE ID WEITERREICHEN (an Template)
+				//WENN KUNDE ANGEMELDET, SEINE ID WEITERREICHEN (an Template)
+				//WENN KUNDE ANGEMELDET, SEINE ID WEITERREICHEN (an Template)
+				//WENN KUNDE ANGEMELDET, SEINE ID WEITERREICHEN (an Template)
+				
+				
 				for(int ordered = 0; ordered < alreadyOrdered.size(); ordered++)
 				{
 					if(listOfGroups.contains(alreadyOrderedAsArrayList.get(ordered)))
@@ -215,12 +260,9 @@ public class Angebote extends HttpServlet {
 						+ "bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\""
 						+ " crossorigin=\"anonymous\"><title>Das könnte Sie interessieren</title></br>&nbsp&nbsp&nbsp&nbsp"
 								+ "Angemeldet als " + userFirstname + userLastname + "&nbsp&nbsp&nbsp&nbsp"
-								+ "<a href=http://localhost:8080/CoolSolutions/Angebote?id=0>Abmelden</a>&nbsp&nbsp&nbsp&nbsp"
-								+ "<h2>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-								+ "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
-								+ "<b>CoolSolutions Online-Shop</b></h2></head><body>"
+								+ "<a href=http://localhost:8080/CoolSolutions/Warenkorb?id=" + customerID + ">zum Warenkorb(" + numberOfOrderedArticles + ")</a>&nbsp&nbsp&nbsp&nbsp"
+								+ "<a href=http://localhost:8080/CoolSolutions/Angebote?id=" + customerID + "&destroy=1>Abmelden</a>"
+								+ "<body><h2 align=center><b>CoolSolutions Online-Shop</b></h2>"
 								+ "<h4>&nbsp&nbsp&nbspDas könnte Sie interessieren</h4>");
 				
 				// AUSGABE
@@ -311,7 +353,7 @@ public class Angebote extends HttpServlet {
 							{
 								out.println("<form>");
 								out.println("<table class=table table-bordered>");
-								out.println("<tr class=\"info\"><td>&nbsp" + rs.getString(1) + "<a href=http://localhost:8080/CoolSolutions/Template?id=" + rs.getString(2) + ">Details</a>" + "</td></tr>");
+								out.println("<tr class=\"info\"><td>&nbsp" + rs.getString(1) + "<a href=http://localhost:8080/CoolSolutions/Template?articleID=" + rs.getString(2) + ">Details</a>" + "</td></tr>");
 								out.println("<tr><td></td></tr>");
 								out.println("</table>");
 								out.println("</form>");
