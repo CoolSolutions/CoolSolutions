@@ -9,7 +9,16 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Base64;
+import java.util.Date;
+import java.util.Properties;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -58,6 +67,7 @@ public class RegisterProcessing extends HttpServlet
 			int randomInt = (int) (Math.random() * 74) + 48;
 			salt += (char) randomInt;
 		}
+		String actCode = "";
 
 		// BEISPIEL: Hash Ergebnis bei folgenden, konstanten Passwort- und
 		// Saltwerten
@@ -91,6 +101,7 @@ public class RegisterProcessing extends HttpServlet
 		String SEL_CITY = "";
 		String SEL_MAIL = "";
 		String INS = "";
+		String INS_ACT = "";
 
 		try
 		{
@@ -146,6 +157,22 @@ public class RegisterProcessing extends HttpServlet
 
 				int ins_rows = stmt.executeUpdate(INS);
 				// TODO - bei anzahl != 1 reagieren
+				
+				// Aktivation Code generieren
+				for (int i = 0; i < 16; i++)
+				{
+					// ASCII Code zwischen 97 und 122
+					int randomInt = (int) (Math.random() * 25) + 97;
+					actCode += (char) randomInt;
+				}
+				
+				INS_ACT  = "INSERT INTO Aktivierung (E_Mail, AktCode) ";
+				INS_ACT += "VALUES (";
+				INS_ACT += "N'" + email + "'";
+				INS_ACT += ", N'" + actCode + "')";				
+				
+				int ins_act_rows = stmt.executeUpdate(INS_ACT);
+				
 			}
 
 		}
@@ -200,6 +227,37 @@ public class RegisterProcessing extends HttpServlet
 		}
 		else
 		{
+			
+
+			
+			Properties props = System.getProperties();
+			props.setProperty("mail.smtp.host", "localhost");
+			props.setProperty("mail.transport.protocol", "smtp");
+
+			Session session = Session.getDefaultInstance(props, null);
+			MimeMessage message = new MimeMessage(session);
+
+			try
+			{
+				message.setFrom(new InternetAddress("benutzer@test.de"));
+				message.addRecipient(Message.RecipientType.TO, new InternetAddress(
+						"benutzer@test.de"));
+				message.setSubject("Testmail 325");
+				message.setSentDate(new Date());
+				message.setContent(
+						"<h1>Registrierungslink</h1><br/><a href='http://localhost:8080/CoolSolutions/Activation?mail=" + email + "&activation=" + actCode + "'>Bitte hier registrieren...</a>",
+						"text/html");
+				Transport.send(message);
+			} 
+			catch (AddressException e)
+			{
+				e.printStackTrace();
+			}
+			catch (MessagingException e)
+			{
+				e.printStackTrace();
+			}
+			
 			//System.out.println("PROCESSING OK");
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
