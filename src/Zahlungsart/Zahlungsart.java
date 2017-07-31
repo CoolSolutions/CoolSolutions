@@ -1,4 +1,4 @@
-package CreditCard;
+package Zahlungsart;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,15 +14,15 @@ import javafx.scene.control.RadioButton;
 /**
  * Servlet implementation class Bestellung
  */
-@WebServlet("/Bezahlungsart")
-public class Bezahlungsart extends HttpServlet
+@WebServlet("/Zahlungsart")
+public class Zahlungsart extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public Bezahlungsart()
+	public Zahlungsart()
 	{
 		super();
 		// TODO Auto-generated constructor stub
@@ -46,7 +46,7 @@ public class Bezahlungsart extends HttpServlet
 		out.println("</head>");
 		out.println("<body>");
 		out.println("<div class=\"container\">");
-		out.println("<form class=\"form-horizontal\" action=\"/CoolSolutions/Kreditkarte\" method=\"post\">");
+		out.println("<form class=\"form-horizontal\" action=\"/CoolSolutions/ZahlungsartProcessing\" method=\"post\">");
 
 		out.println("<br />");
 
@@ -56,9 +56,7 @@ public class Bezahlungsart extends HttpServlet
 
 		
 		
-		// Bestellung Abbrechen Button
-		out.println("<button onclick=\"window.location.href='/CoolSolutions'\">Abbrechen</button>");
-		//out.println("<button class=\"btn btn-sm  \" type=\"submit\"> Bestellung Abbrechen</button> &nbsp ");
+
 		
 		out.println("<br />");
 		out.println("<br />");
@@ -97,7 +95,12 @@ public class Bezahlungsart extends HttpServlet
 		//out.println("<form action =\"http://127.0.0.1:8080/CoolSolutions/KreditKarte\"method\"get\">");
 		
 
-		//out.println("</form>");
+		out.println("</form>");
+		
+		// Bestellung Abbrechen Button
+		out.println("<button onclick=\"window.location.href='/CoolSolutions'\">Abbrechen</button>");
+		//out.println("<button class=\"btn btn-sm  \" type=\"submit\"> Bestellung Abbrechen</button> &nbsp ");
+		
 		out.println("</div>");
 		out.println("</body>");
 

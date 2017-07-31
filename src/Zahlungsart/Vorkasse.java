@@ -1,4 +1,4 @@
-package CreditCard;
+package Zahlungsart;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -10,16 +10,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class Nachnahme
+ * Servlet implementation class Vorkasse
  */
-@WebServlet("/Nachnahme")
-public class Nachnahme extends HttpServlet {
+@WebServlet("/Vorkasse")
+public class Vorkasse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Nachnahme() {
+    public Vorkasse() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -44,15 +44,12 @@ public class Nachnahme extends HttpServlet {
 
 		out.println("<br />");
 
-		out.println("</label > Sie haben denn Nachnahme zahlungsart gaewehlt");
+		out.println("</label > Erst nach dem Überweisung wir die Ware gaesendet");
 		out.println("<br />");
 		out.println("<br />");
 
-		
-		
 		
 		// Zahlungsart
-
 		out.println("<label class=\"radio-outline\">");
 		
 
@@ -68,7 +65,7 @@ public class Nachnahme extends HttpServlet {
 			//out.println("<button class=\"btn btn-sm btn-primary \" input type=\"submit\" name=\"abschicken\" value=\"Kreditkarte\"> Weiter</button>");	
 		
 		// Weiter Button
-		out.println("<button class=\"btn btn-sm btn-primary \" input type=\"submit\" name=\"abschicken\" value=\"Kreditkarte\"> Kaufen abschliessen</button>");
+		out.println("<button class=\"btn btn-sm btn-primary \" input type=\"submit\" name=\"abschicken\" value=\"Überweisen\"> Kaufen abschliessen</button>");
 		//out.println("<form action =\"http://127.0.0.1:8080/CoolSolutions/KreditKarte\"method\"get\">");
 		
 
@@ -77,7 +74,6 @@ public class Nachnahme extends HttpServlet {
 		out.println("</body>");
 
 		out.println("<br />");
-
 	}
 
 	/**

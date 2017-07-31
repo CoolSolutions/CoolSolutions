@@ -1,4 +1,4 @@
-package CreditCard;
+package Zahlungsart;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,7 +40,7 @@ public class Weiter extends HttpServlet {
 		out.println("</head>");
 		out.println("<body>");
 		out.println("<div class=\"container\">");
-		out.println("<form class=\"form-horizontal\" action=\"/CoolSolutions/Login\" method=\"post\">");
+		out.println("<form class=\"form-horizontal\" action=\"/CoolSolutions/Offers\" method=\"post\">");
 
 		out.println("<br />");
 

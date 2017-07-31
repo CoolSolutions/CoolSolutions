@@ -1,9 +1,8 @@
-package CreditCard;
+package Zahlungsart;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,24 +10,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class KreditKarte
+ * Servlet implementation class Nachnahme
  */
-@WebServlet("/Kreditkarte")
-public class Kreditkarte extends HttpServlet {
+@WebServlet("/Nachnahme")
+public class Nachnahme extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Kreditkarte() {
+    public Nachnahme() {
         super();
         // TODO Auto-generated constructor stub
-    }
-    
-    
-    public void init(ServletConfig config) throws ServletException
-    {
-    	
     }
 
 	/**
@@ -41,34 +34,45 @@ public class Kreditkarte extends HttpServlet {
 		out.println("<html lang=\"de\">");
 		out.println("<head>");
 		out.println("<meta charset=\"utf-8\">");
-		out.println("<title>CoolSolutions Kreditkarte</title>");
-		out.println("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">");
+		out.println("<title>CoolSolutions Bestellung</title>");
+		out.println(
+				"<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">");
 		out.println("</head>");
 		out.println("<body>");
 		out.println("<div class=\"container\">");
-		out.println("<form class=\"form-horizontal\" action=\"/CoolSolutions/Kaufen\" method=\"post\">");
+		out.println("<form class=\"form-horizontal\" action=\"/CoolSolutions/Login\" method=\"post\">");
 
 		out.println("<br />");
 
-		out.println("</label > Geben Sie bitte ihre Kredit Karte Nummer ein");
-		
-		
-		
+		out.println("</label > Sie haben denn Nachnahme zahlungsart gaewehlt");
 		out.println("<br />");
 		out.println("<br />");
 
 		
 		
 		
-		// Kredit Karte Nummer
+		// Zahlungsart
 
+		out.println("<label class=\"radio-outline\">");
 		
-		out.println("<input type=\"text\" name=\"CreditCardNumber\" id=\"inputCreditCardNumber\" class=\"form-control\" placeholder=\"Kreditkartenummer\" >");
+
+
 		out.println("<br />");
-		out.println("<button class=\"btn btn-sm btn-primary \" input type=\"submit\" name=\"abschicken\" value=\"Kaufen\"> Weiter</button>");
+		out.println("<br />");
 
+		// Bestellung Abbrechen Button
+		out.println("<button onclick=\"window.location.href='/CoolSolutions'\">Abbrechen</button>");
+		//out.println("<button class=\"btn btn-sm  \" type=\"submit\"> Bestellung Abbrechen</button> &nbsp ");
+	
 		
-		out.println("</form>");
+			//out.println("<button class=\"btn btn-sm btn-primary \" input type=\"submit\" name=\"abschicken\" value=\"Kreditkarte\"> Weiter</button>");	
+		
+		// Weiter Button
+		out.println("<button class=\"btn btn-sm btn-primary \" input type=\"submit\" name=\"abschicken\" value=\"Kreditkarte\"> Kaufen abschliessen</button>");
+		//out.println("<form action =\"http://127.0.0.1:8080/CoolSolutions/KreditKarte\"method\"get\">");
+		
+
+		//out.println("</form>");
 		out.println("</div>");
 		out.println("</body>");
 
