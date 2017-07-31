@@ -43,27 +43,17 @@ public class Offers extends HttpServlet {
 		Statement stmt = null;
 		ResultSet rs = null;
 		
-		int customerID = 0;
+		// Session übernehmen. Wenn keine Session gestartet, userID = 0
+		int userID = 0;
 			
 		HttpSession session = request.getSession();
 		if(session.getAttribute("userID") != null)
 		{	
-			customerID = (int)(session.getAttribute("userID"));
+			userID = (int)(session.getAttribute("userID"));
 		}
 
-		// WENN NICHT ANGEMELDETER KUNDE -> SESSION ERSTELLEN UND WEITERREICHEN (an Template) 
-		// (nach "Abmelden" oder Browser schliessen Session beenden)
-		// WENN NICHT ANGEMELDETER KUNDE -> SESSION ERSTELLEN UND WEITERREICHEN (an Template) 
-		// (nach "Abmelden" oder Browser schliessen Session beenden)
-		// WENN NICHT ANGEMELDETER KUNDE -> SESSION ERSTELLEN UND WEITERREICHEN (an Template) 
-		// (nach "Abmelden" oder Browser schliessen Session beenden)
-		// WENN NICHT ANGEMELDETER KUNDE -> SESSION ERSTELLEN UND WEITERREICHEN (an Template) 
-		// (nach "Abmelden" oder Browser schliessen Session beenden)
-		
 		response.setContentType("text/html");
 	    PrintWriter out = response.getWriter();	 
-	    
-	    // out.println("session: " + session);
 	    
 	    String resourcename = "java:comp/env/jdbc/coolsolutions";
 		DataSource ds = null;
@@ -115,7 +105,7 @@ public class Offers extends HttpServlet {
 				}
 			}
 			
-			if(customerID == 0)
+			if(userID == 0)
 			{
 				out.println("<html><head><link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/"
 						+ "bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\""
@@ -164,7 +154,7 @@ public class Offers extends HttpServlet {
 				}
 				
 				// Anzahl der Artikel im Warenkorb des Kunden auslesen
-				SQL = "SELECT Menge FROM Warenkorb WHERE Kunde_ID="+customerID;
+				SQL = "SELECT Menge FROM Warenkorb WHERE Kunde_ID="+userID;
 				stmt = conn.createStatement();
 				rs = stmt.executeQuery(SQL);
 				
@@ -175,7 +165,7 @@ public class Offers extends HttpServlet {
 				}
 				
 				// Pruefen, welche Artikelgruppen der Kunde schon bestellt hat
-				SQL = "SELECT Artikelgruppe.ID FROM Kunde INNER JOIN Bestellung ON Kunde.ID = Bestellung.Kunde_ID INNER JOIN Bestelldetails ON Bestellung.ID = Bestelldetails.Bestellung_ID INNER JOIN Artikel ON Bestelldetails.Artikel_ID = Artikel.ID INNER JOIN Artikelgruppe ON Artikel.Artikelgruppe_ID = Artikelgruppe.ID WHERE Kunde_ID=" + customerID;
+				SQL = "SELECT Artikelgruppe.ID FROM Kunde INNER JOIN Bestellung ON Kunde.ID = Bestellung.Kunde_ID INNER JOIN Bestelldetails ON Bestellung.ID = Bestelldetails.Bestellung_ID INNER JOIN Artikel ON Bestelldetails.Artikel_ID = Artikel.ID INNER JOIN Artikelgruppe ON Artikel.Artikelgruppe_ID = Artikelgruppe.ID WHERE Kunde_ID=" + userID;
 				stmt = conn.createStatement();
 				rs = stmt.executeQuery(SQL);
 				
@@ -197,7 +187,7 @@ public class Offers extends HttpServlet {
 				
 				/* dem Kunden Artikel aus anderen Kategorien anbieten */
 				// Kundennamen auslesen
-				SQL = "SELECT Kunde.Name, Kunde.Vorname FROM Kunde WHERE Kunde.ID=" + customerID;
+				SQL = "SELECT Kunde.Name, Kunde.Vorname FROM Kunde WHERE Kunde.ID=" + userID;
 				stmt = conn.createStatement();
 				rs = stmt.executeQuery(SQL);
 			
@@ -242,7 +232,7 @@ public class Offers extends HttpServlet {
 						+ "bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\""
 						+ " crossorigin=\"anonymous\"><title>Das könnte Sie interessieren</title></br>&nbsp&nbsp&nbsp&nbsp"
 								+ "Angemeldet als " + userFirstname + userLastname + "&nbsp&nbsp&nbsp&nbsp"
-								+ "<a href=http://localhost:8080/CoolSolutions/Warenkorb?id=" + customerID + ">zum Warenkorb(" + numberOfOrderedArticles + ")</a>&nbsp&nbsp&nbsp&nbsp"
+								+ "<a href=http://localhost:8080/CoolSolutions/Warenkorb?userID=" + userID + ">zum Warenkorb(" + numberOfOrderedArticles + ")</a>&nbsp&nbsp&nbsp&nbsp&nbsp"
 								+ "<a href=\" " + response.encodeURL("/CoolSolutions/Logout") + "\">Abmelden</a>&nbsp&nbsp&nbsp&nbsp"
 								+ "<body><h2 align=center><b>CoolSolutions Online-Shop</b></h2>"
 								+ "<h4>&nbsp&nbsp&nbspDas könnte Sie interessieren</h4>");

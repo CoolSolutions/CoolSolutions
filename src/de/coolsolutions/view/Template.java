@@ -42,12 +42,13 @@ public class Template extends HttpServlet {
 		
 		int articleID = Integer.parseInt(request.getParameter("articleID"));
 		
-		int customerID = 1;
-		
+		// Session übernehmen. Wenn keine Session gestartet, userID = 0
+		int userID = 0;
+			
 		HttpSession session = request.getSession();
-		if(session.getAttribute("id") != null)
+		if(session.getAttribute("userID") != null)
 		{	
-			customerID = (int)(session.getAttribute("id"));
+			userID = (int)(session.getAttribute("userID"));
 		}
 		
 		response.setContentType("text/html");
@@ -64,7 +65,7 @@ public class Template extends HttpServlet {
 			conn = ds.getConnection();
 			
 			// Kundennamen auslesen
-			String SQL = "SELECT Kunde.Name, Kunde.Vorname FROM Kunde WHERE Kunde.ID=" + customerID;
+			String SQL = "SELECT Kunde.Name, Kunde.Vorname FROM Kunde WHERE Kunde.ID=" + userID;
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(SQL);
 		
@@ -75,9 +76,23 @@ public class Template extends HttpServlet {
 				userFirstname = rs.getString(1);
 				userLastname = rs.getString(2);
 			}
+			
+			// Wenn ein Artikel zum Warenkorb hinzugefügt wurde, dieses Artikel in die Tabelle Warenkorb speichern
+			if(request.getParameter("ordered") != null && request.getParameter("ordered").equals("true"))
+			{	
+				SQL = "INSERT INTO Warenkorb(Kunde_ID, Artikel_ID, Menge)";
+				SQL += "VALUES(";
+				SQL += "N'" + userID + "'";
+				SQL += ", N'" + articleID + "'";
+				SQL += ", " + 1 + ")";
+				
+				stmt = conn.createStatement();
+				stmt.executeUpdate(SQL);
+			}
+						
 
 			// Anzahl der Artikel im Warenkorb des Kunden auslesen
-			SQL = "SELECT Menge FROM Warenkorb WHERE Kunde_ID="+customerID;
+			SQL = "SELECT Menge FROM Warenkorb WHERE Kunde_ID="+userID;
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(SQL);
 			
@@ -104,29 +119,34 @@ public class Template extends HttpServlet {
 			{
 				out.println("<html><head><link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\"><title>Angebot</title></head></br><body>");
 				out.println("&nbsp&nbsp&nbsp");
-				if(customerID == 0)
+				if(userID == 0)
 				{
 				out.println("<a href=http://localhost:8080/CoolSolutions/Login>Anmelden</a>&nbsp&nbsp&nbsp&nbsp"
 						+ "<a href=http://localhost:8080/CoolSolutions/Register>Registrieren</a></head></br>");
+				out.println("<a href=http://localhost:8080/CoolSolutions/Angebote?userID=" + userID + ">Startseite</a>&nbsp&nbsp&nbsp&nbsp");
 				}
 				else
 				{
 					out.println("Angemeldet als " + userFirstname + userLastname + "&nbsp&nbsp&nbsp&nbsp"
-							+ "<a href=http://localhost:8080/CoolSolutions/Warenkorb?id=" + customerID + ">zum Warenkorb(" + numberOfOrderedArticles + ")</a>&nbsp&nbsp&nbsp&nbsp"
-							+ "<a href=http://localhost:8080/CoolSolutions/Angebote?id=" + customerID + "&destroy=1>Abmelden</a>");
+							+ "<a href=http://localhost:8080/CoolSolutions/Warenkorb?userID=" + userID + "&articleID=" + articleID + ">zum Warenkorb(" + numberOfOrderedArticles + ")</a>&nbsp&nbsp&nbsp&nbsp");
+					out.println("<a href=\" " + response.encodeURL("/CoolSolutions/Logout") + "\">Abmelden</a>&nbsp&nbsp&nbsp&nbsp");
+					out.println("<a href=http://localhost:8080/CoolSolutions/Angebote>Startseite</a>&nbsp&nbsp&nbsp&nbsp");
 				}
 				out.println("<body><h2 align=center><b>CoolSolutions Online-Shop</b></h2>"
 						+ "<h4 align=center>&nbsp&nbsp" + rs.getString(2) + "</h4>");
-				out.println("<form action=\"http://localhost:8080/CoolSolutions/Template?articleID=" + rs.getString(1) + "&kundenID=" + customerID + "&bestellt=true\"" + ">");
+				out.println("<form>");
+				out.println("<input type=hidden name=articleID value=" + rs.getString(1) + ">");
+				out.println("<input type=hidden name=userID value=" + userID + ">");
+				out.println("<input type=hidden name=ordered value=true >");
 				out.println("<table class=table table-bordered>");
 				out.println("<tr class=\"info\">");
-				out.println("<td><b>Name:</b> " + rs.getString(2) + "</br>");
-				out.println("<b>Preis:</b> " + rs.getString(3) + " Euro" + "</br>");
-				out.println("<b>Beschreibung:</b> " + rs.getString(4) + "</td>");
+				out.println("<td>&nbsp&nbsp<b>Name:</b> " + rs.getString(2) + "</br>");
+				out.println("<b>&nbsp&nbspPreis:</b> " + rs.getString(3) + " Euro" + "</br>");
+				out.println("<b>&nbsp&nbspBeschreibung:</b> " + rs.getString(4) + "</td>");
 				out.println("</tr></table>");
-				if(customerID != 0)
+				if(userID != 0)
 				{
-					out.println("<p>&nbsp&nbsp<input type=\"submit\" name=Bestellen value=\"Zum Warenkorb hinzufügen\"></p>");
+					out.println("<p>&nbsp&nbsp&nbsp&nbsp<input type=\"submit\" name=Bestellen value=\"Zum Warenkorb hinzufügen\"></p>");
 				}
 				out.println("</form>");
 			}
