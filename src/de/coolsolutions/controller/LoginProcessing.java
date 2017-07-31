@@ -151,7 +151,5 @@ public class LoginProcessing extends HttpServlet
 		{
 			response.sendRedirect(response.encodeRedirectURL("/CoolSolutions/Angebote"));
 		}
-
 	}
-
 }
