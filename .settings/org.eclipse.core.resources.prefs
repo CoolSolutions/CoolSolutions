@@ -1,2 +1,6 @@
+=\=\=\=\=\=\=
+<<<<<<<=HEAD
+>>>>>>>=refs/heads/Warenkorb
 eclipse.preferences.version=1
-encoding//src/de/coolsolutions/view/Angebote.java=UTF-8
+encoding//src/de/coolsolutions/view/ShoppingCart.java=UTF-8
+encoding//src/de/coolsolutions/view/Template.java=UTF-8
