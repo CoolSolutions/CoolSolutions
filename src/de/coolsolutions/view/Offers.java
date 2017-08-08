@@ -86,7 +86,7 @@ public class Offers extends HttpServlet {
      */
 	@SuppressWarnings("resource")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub 
 		 
 		// Lokalisierung
 		Locale locale = request.getLocale();
