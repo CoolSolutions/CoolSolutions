@@ -47,7 +47,10 @@ public class Login extends HttpServlet {
 			}
 			if(request.getAttribute("faultyInsertion").equals("password")){
 				out.println("<li class=\"password\">Bitte überprüfen Sie das Passwort</li>");
-			}			
+			}
+			if(request.getAttribute("faultyInsertion").equals("activation")){
+				out.println("<li class=\"mail\">Ihr Konto wurde noch nicht freigeschaltet. Bitte schalten Sie Ihr Konto über den Aktivierungslink frei</li>");
+			}
 			out.println("</ul></div>");
 	    }
 		

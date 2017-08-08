@@ -1,4 +1,4 @@
-package Zahlungsart;
+package de.coolsolutions.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -32,6 +32,15 @@ import javax.sql.DataSource;
  * Servlet implementation class PaymentProcessing
  */
 @WebServlet("/PaymentProcessing")
+/**
+ * In diese Klase 
+ * 
+ * @author Besnik Morina
+ * @version 3.0
+ * @date 08.08.2017
+ * @since 1.5
+ *
+ */
 public class PaymentProcessing extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

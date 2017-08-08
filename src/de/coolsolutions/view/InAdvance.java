@@ -1,26 +1,41 @@
-package Zahlungsart;
+package de.coolsolutions.view;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
+import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 /**
- * Servlet implementation class Weiter
+ * Servlet implementation class Vorkasse
  */
-@WebServlet("/Next")
-public class Next extends HttpServlet
+@WebServlet("/InAdvance")
+/**
+ * 
+ * 
+ * @author Besnik Morina
+ * @version 3.0
+ * @date 08.08.2017
+ * @since 1.5
+ *
+ */
+public class InAdvance extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public Next()
+	public InAdvance()
 	{
 		super();
 		// TODO Auto-generated constructor stub
@@ -34,8 +49,23 @@ public class Next extends HttpServlet
 	{
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
+		
+		
+		// Session übernehmen. Wenn keine Session gestartet, userID = 0
+		int userID = 0;
+		
+		HttpSession session = request.getSession();
+		if(session.getAttribute("userID") != null)
+		{	
+			userID = (int)(session.getAttribute("userID"));
+		}
+		
+	
 
-		out.println("<html lang=\"de\">");
+		
+
+		out.println("<!DOCTYPE html>");
+		out.println("<html lang=\"en\">");
 		out.println("<head>");
 		out.println("<meta charset=\"utf-8\">");
 		out.println("<title>CoolSolutions Bestellung</title>");
@@ -43,25 +73,27 @@ public class Next extends HttpServlet
 				"<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<div class=\"container\">");
-		out.println("<form class=\"form-horizontal\" action=\"/CoolSolutions/Offers\" method=\"post\">");
+		
+		
 
 		out.println("<br />");
 
-		out.println("</label > Danke für ihre einkauf!");
+		out.println("<label > Erst nach dem Überweisung wir die Ware gesendet</label>");
 		out.println("<br />");
 		out.println("<br />");
 
-		// Eine Dankeschön nach dem Kauf Baestetigung
+		
+		// Bestellung Abbrechen Button
+		out.println("<button onclick=\"window.location.href='/CoolSolutions/Offers'\">Abbrechen</button>");
+		
 
-		// Weiter zu andere Seite
-		out.println("<button onclick=\"window.location.href='/CoolSolutions/Offers'\">Weiter</button>");
-
-		// out.println("</form>");
-		out.println("</div>");
+		// Weiter Button
+		out.println("<button onclick=\"window.location.href='/CoolSolutions/PaymentSuccess'\">Kauf bestätigen</button>");
+		
 		out.println("</body>");
-		out.println("<br />");
+		out.println("</html>");
 
+		
 	}
 
 	/**

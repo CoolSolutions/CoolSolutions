@@ -6,6 +6,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 
 import javax.naming.InitialContext;
 import javax.servlet.ServletException;
@@ -20,6 +23,25 @@ import javax.sql.DataSource;
  * Servlet implementation class Warenkorb
  */
 @WebServlet("/Warenkorb")
+/**
+ * Die Klasse ShoppingCart erzeugt die Oberflaeche fuer den Warenkorb des Kunden.
+ * Dafuer werden alle Datensaetze der Tabelle Warenkorb aus der Datenbank ausgelesen
+ * und auf dem Bildschirm ausgegeben. Ein Warenkorb kann nur fuer einen angemeldeten 
+ * Benutzer erzeugt werden. 
+ * Die Klasse genieriet mit Schaltflaechen/Links zum, 
+ * (1) Loeschen einiger/aller Artikel aus dem Warenkorb,
+ * (2) Aufruf der Beschreibungsseite jedes im Warenkorb befindlichen Artikels, 
+ * (3) Wechsel zur Startseite,
+ * (4) Bestaetigung aller Artikel (noch kein Abschluss des Kaufvertrages) = Wechsel zum naechsten 
+ * Schritt (Zahlungsmethode auswählen),
+ * (5) Abmeldung.
+ * 
+ * @author Dieter Simon
+ * @version 5.6
+ * @date 08.08.2017
+ * @since 1.5
+ * 
+ */
 public class ShoppingCart extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -34,8 +56,53 @@ public class ShoppingCart extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+    /**
+     * 
+     * Die Methode doGet(request, response) liest zuerst die ArtikelID aus dem
+     * Request aus, die immer uebergeben wird, weil ein Artikel immer angezeigt werden muss.
+     * Es sind keine Requests an diesen Servlet programmiert, die keinen Parameter "artikelID" enthalten.
+     * 
+     * Im naechsten Schritt prueft die Methode, ob eine Session gestartet wurde.
+     * Dabei wird nach dem Session-Attribut "userID" geschaut.
+     * 
+     * Falls KEINE Session gestartet wurde (der Kunde ist nicht angemeldet), werden der Name, die Beschreibung und
+     * der Preis des Artikels mit der ArtikelID ausgeben, die mit dem Request-Parameter mituebergeben wurde. 
+     * 
+     * Falls eine Session gestartet wurde (der Kunde ist angemeldet), wird unter den Artikeldaten die 
+     * Schaltflaeche "Zum Warenkorb hinzufügen" generiert. Der Klick darauf ruft die Seite erneut auf,
+     * dabei wird der Parameter "ordered=true", der Parameter "userID" und der Parameter "articleID" mit
+     * uebergeben. Wenn der Parameter "ordered=true" von der doGet(request, response)-Methode gefunden wird,
+     * wird der Artikel mit dem entsprechenden Parameter "articleID" in der Tabelle "Warenkorb", die mit dem
+     * Kunden ueber eine Primaer-Fremd-Schluessel-Beziehung verbunden ist, gespeichert. Es wird aber vorher 
+     * geprueft, ob sich dieser Artikel noch nicht im Warenkorn des Kunden befinden. Falls nein, wird es 
+     * dort gespeichert, er dort doch schon liegt, wird der Datensatz mit dem Artikel aktualisiert, 
+     * indem der Wert in der Spalte "Menge" um 1 erhoeht wird.  
+     * 
+     * @param request HttpServletRequest Der Parameter ist die Anfrage an den Servlet 
+	 * @param response HttpServletResponse Der Parameter ist die Rueckmaldung des Servlets
+	 * @throws ServletException, IOException
+     * 
+     */
+	@SuppressWarnings("resource")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		
+		// Lokalisierung
+		Locale locale = request.getLocale();
+		ResourceBundle textbundle = PropertyResourceBundle.getBundle("res.Testausgabe", locale);
+		String home = textbundle.getString("Startseite");
+		String logout = textbundle.getString("Abmelden");
+		String message = textbundle.getString("Nachricht");
+		String cart2 = textbundle.getString("Warenkorb2");
+		String loggedInAs = textbundle.getString("Angemeldet");
+		String yourOrder = textbundle.getString("Bestellung");
+		String totalAm = textbundle.getString("Gesamtpreis");
+		String name = textbundle.getString("Name");
+		String price = textbundle.getString("Preis");
+		String noContract = textbundle.getString("KeinVertrag");
+		String cartEmpty = textbundle.getString("WarenkorbLeer");
+		String paymentMethod = textbundle.getString("Zahlungsart");
+		String back = textbundle.getString("Zurueck");
 		
 		Connection conn = null;
 		Statement stmt = null;
@@ -63,7 +130,7 @@ public class ShoppingCart extends HttpServlet {
 
 			conn = ds.getConnection();
 			// Kundennamen auslesen
-			String SQL = "SELECT Kunde.Name, Kunde.Vorname FROM Kunde WHERE Kunde.ID=" + userID;
+			String SQL = "SELECT Kunde.Vorname, Kunde.Name FROM Kunde WHERE Kunde.ID=" + userID;
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(SQL);
 		
@@ -77,83 +144,97 @@ public class ShoppingCart extends HttpServlet {
 		
 			out.println("<html><head><link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/"
 				+ "bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\""
-				+ " crossorigin=\"anonymous\"><title>Das könnte Sie interessieren</title></br>&nbsp&nbsp&nbsp&nbsp"
-				+ "Angemeldet als " + userFirstname + userLastname + "&nbsp&nbsp&nbsp&nbsp");
+				+ " crossorigin=\"anonymous\"><title>" + message + "</title></br>&nbsp&nbsp&nbsp&nbsp"
+				+ "" + loggedInAs + "&nbsp" + userFirstname + userLastname + "&nbsp&nbsp&nbsp&nbsp");
 			if(request.getParameter("articleID") != null)
 			{
-				out.println("<a href=http://localhost:8080/CoolSolutions/Template?userID=" + userID + "&articleID=" + Integer.parseInt(request.getParameter("articleID")) + ">zurück zum letzen Artikel</a>&nbsp&nbsp&nbsp&nbsp");
+				out.println("<a href=http://localhost:8080/CoolSolutions/Template?userID=" + userID + "&articleID=" + Integer.parseInt(request.getParameter("articleID")) + ">" + back + "</a>&nbsp&nbsp&nbsp&nbsp");
 			}
-			out.println("<a href=http://localhost:8080/CoolSolutions/Angebote?userID=" + userID + ">Startseite</a>&nbsp&nbsp&nbsp&nbsp");
-			out.println("<a href=\" " + response.encodeURL("/CoolSolutions/Logout") + "\">Abmelden</a>&nbsp&nbsp&nbsp&nbsp"
+			out.println("<a href=http://localhost:8080/CoolSolutions/Angebote?userID=" + userID + ">" + home + "</a>&nbsp&nbsp&nbsp&nbsp");
+			out.println("<a href=\" " + response.encodeURL("/CoolSolutions/Logout") + "\">" + logout + "</a>&nbsp&nbsp&nbsp&nbsp"
 						+ "<body><h5 align=center>CoolSolutions Online-Shop</h5>"
-						+ "<h2 align=center><b>WARENKORB</b></h2>"
-						+ "<h4>&nbsp&nbsp&nbspIhre Bestellung</h4>");
+						+ "<h2 align=center><b>" + cart2 + "</b></h2>"
+						+ "<h4>&nbsp&nbsp&nbsp" + yourOrder + "</h4>");
 			
 			// Falls ein Artikel zum Löschen markiert wurde, diesen Artikel aus der DB löschen
 			if(request.getParameter("deleted") != null && request.getParameter("deleted").equals("true"))
 			{
-				SQL = "DELETE FROM Warenkorb WHERE ID=" + Integer.parseInt(request.getParameter("lineNumber")) + "";
+				// Bestellmenge des zu loeschenden Artikels auslesen
+				SQL = "SELECT Menge FROM Warenkorb WHERE Artikel_ID =" + Integer.parseInt(request.getParameter("articleToDelete"));
 				stmt = conn.createStatement();
-				stmt.executeUpdate(SQL);
+				rs = stmt.executeQuery(SQL);
+				int amount = 0;
+				if(rs.next())
+				{
+					amount = rs.getInt(1);
+				}
+				// Wenn Menge > 1, von der Menge eine 1 abziehen, sonst den Datensatz aus der Datenbank loeschen
+				if(amount > 1)
+				{
+					SQL = "UPDATE Warenkorb SET Menge =" + (--amount) + " WHERE Artikel_ID =" + Integer.parseInt(request.getParameter("articleToDelete"));
+					
+					stmt = conn.createStatement();
+					stmt.executeUpdate(SQL);
+				}
+				else
+				{
+					SQL = "DELETE FROM Warenkorb WHERE Artikel_ID =" + Integer.parseInt(request.getParameter("articleToDelete"));
+					
+					stmt = conn.createStatement();
+					stmt.executeUpdate(SQL);
+				}
 			}
 			
-			// Bestellung auslesen
-			SQL = "SELECT Artikel.Name, Artikel.Preis, Warenkorb.Menge, Warenkorb.ID FROM Kunde INNER JOIN Warenkorb ON Kunde.ID = Warenkorb.Kunde_ID INNER JOIN Artikel ON Artikel.ID = Warenkorb.Artikel_ID WHERE Kunde.ID=" + userID;
+			// Warenkorb auslesen
+			SQL = "SELECT Artikel.Name, Artikel.Preis, Warenkorb.Menge, Artikel.ID FROM Kunde INNER JOIN Warenkorb ON Kunde.ID = Warenkorb.Kunde_ID INNER JOIN Artikel ON Artikel.ID = Warenkorb.Artikel_ID WHERE Kunde.ID=" + userID;
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(SQL);
 			
 			ArrayList<String> allArticles = new ArrayList<>();
 			while(rs.next())
 			{
-//				out.println("HALLO");
 				allArticles.add(rs.getString(1));
-//				out.println(rs.getString(1) + ", ");
 				allArticles.add(rs.getString(2));
-//				out.println(rs.getString(2) + ", ");
 				allArticles.add(rs.getString(3));
-//				out.println(rs.getString(3) + ", ");
 				allArticles.add(rs.getString(4));
 			}
 			
-			//AUSGABE
-//			for(String str : allArticles)
-//			{
-//				out.println(str + "</br>");
-//			}
-			//AUSGABE ENDE
-			
+			// Warenkorb ausgeben, wenn er nicht leer ist
 			float totalAmount = 0;
 			int lineNumber = 1;
 			if(allArticles.size() > 0)
 			{
+				// Fuer jeden Artikel im Warenkorb
 				for(int i = 0; i <allArticles.size(); i+=4)
 				{
-//					out.println("i: " + i);
+					// So viele Male, wie die Menge entsprechenden Artikels
 					for(int j = 0; j < Integer.parseInt(allArticles.get(i+2)); j++)
 					{
 						out.print("<form>");
-						out.println("&nbsp&nbsp&nbsp&nbsp" + lineNumber + ". <b>Name:</b> " + allArticles.get(i) + " <b>Preis:</b> " + allArticles.get(i+1) 
+						out.println("&nbsp&nbsp&nbsp&nbsp" + lineNumber + ". <b>" + name + ":&nbsp&nbsp</b><a href=http://localhost:8080/CoolSolutions/Template?articleID=" + allArticles.get(i+3) + ">" + allArticles.get(i) + "</a>&nbsp&nbsp<b>" + price + ":</b> " + allArticles.get(i+1) 
 						+ "&nbsp&nbsp<input type=submit name=Delete value=Delete></br>");
 						out.print("<input type=hidden name=deleted value=true>");
-						out.print("<input type=hidden name=lineNumber value=" + allArticles.get(i+3) + ">");
+						out.print("<input type=hidden name=articleToDelete value=" + allArticles.get(i+3) + ">");
 						if(request.getParameter("articleID") != null)
 						{
+							// Den Link zum zuletzt angesehenen Artikel nach dem Loeschen eines Artikels speichern
 							out.print("<input type=hidden name=articleID value=" + Integer.parseInt(request.getParameter("articleID")) + ">");
 						}
 						out.print("</form>");
 						lineNumber++;
 					}
+						// Gesamtsumme
 						totalAmount += Float.parseFloat(allArticles.get(i+1)) * Float.parseFloat(allArticles.get(i+2));
 				}
 				int adjust = (int)(totalAmount * 100);
 				totalAmount = (float)adjust / 100;
-				out.println("&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>GESAMTPREIS: " + totalAmount + "</b>");
-				out.println("</br></br></br><form action=http://localhost:8080/CoolSolutions/Besnik>&nbsp&nbsp&nbsp&nbsp<input type=submit name=Forward value=\"Zahlungsart wählen\" >");
-				out.println("</br>&nbsp&nbsp&nbsp&nbsp(Dies ist noch kein Vertragsabschluss)");
+				out.println("&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>" + totalAm + ": " + totalAmount + "</b>");
+				out.println("</br></br></br><form action=http://localhost:8080/CoolSolutions/Payment>&nbsp&nbsp&nbsp&nbsp<input type=submit name=Forward value=\"" + paymentMethod + "\" >");
+				out.println("</br>&nbsp&nbsp&nbsp&nbsp(" + noContract + ")");
 			}
 			else
 			{
-				out.println("&nbsp&nbsp&nbsp&nbsp" + "Ihr Warenkorb ist leer");
+				out.println("&nbsp&nbsp&nbsp&nbsp" + cartEmpty);
 			}
 			
 		}
