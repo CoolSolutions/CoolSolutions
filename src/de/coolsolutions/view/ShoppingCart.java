@@ -229,7 +229,7 @@ public class ShoppingCart extends HttpServlet {
 				int adjust = (int)(totalAmount * 100);
 				totalAmount = (float)adjust / 100;
 				out.println("&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>" + totalAm + ": " + totalAmount + "</b>");
-				out.println("</br></br></br><form action=http://localhost:8080/CoolSolutions/Besnik>&nbsp&nbsp&nbsp&nbsp<input type=submit name=Forward value=\"" + paymentMethod + "\" >");
+				out.println("</br></br></br><form action=http://localhost:8080/CoolSolutions/Payment>&nbsp&nbsp&nbsp&nbsp<input type=submit name=Forward value=\"" + paymentMethod + "\" >");
 				out.println("</br>&nbsp&nbsp&nbsp&nbsp(" + noContract + ")");
 			}
 			else

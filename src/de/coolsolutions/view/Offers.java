@@ -60,14 +60,14 @@ public class Offers extends HttpServlet {
      * Die Methode doGet(request, response) prueft zuerst, ob eine Session gestartet wurde.
      * Dabei wird nach dem Session-Attribut "userID" geschaut.
      * 
-     * Falls nicht gestartet (der Kunde ist nicht angemeldet), wird der if-Zweig ausgefÃ¼hrt, der Seite mit Angeboten
+     * Falls nicht gestartet (der Kunde ist nicht angemeldet), wird der if-Zweig ausgeführt, der Seite mit Angeboten
      * fuer einen nicht angemeldeten Kunden generiert.
-     * Wenn die Datenbank aus irgenwelchen GrÃ¼nden leer ist, wird die
+     * Wenn die Datenbank aus irgenwelchen Gründen leer ist, wird die
      * Meldung "Keine Angebote vorhanden" ausgegeben, sonst werden max.5 zufaellige
      * verschiedene Artikel aus der Datenbank ausgegeben
      * 
      * Falls KEINE Session gestartet wurde (der Kunde ist angemeldet), wird der else-Zweig abgearbeitet.
-     * Wenn die Datenbank aus irgenwelchen GrÃ¼nden leer ist, wird auch hier die
+     * Wenn die Datenbank aus irgenwelchen Gründen leer ist, wird auch hier die
      * Meldung "Keine Angebote vorhanden" ausgegeben, sonst werden max. 5 Artikel aus den
      * Artikelgruppen ausgegeben, aus den der Kunde noch nie etwas bestellt hat.
      * Die Vorgehensweise ist dabei die folgende:
@@ -405,3 +405,4 @@ public class Offers extends HttpServlet {
 	}
 
 }
+
