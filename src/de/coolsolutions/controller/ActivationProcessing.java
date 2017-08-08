@@ -138,19 +138,31 @@ public class ActivationProcessing extends HttpServlet
 			// System.out.println("PROCESSING OK");
 			 response.setContentType("text/html"); 
 			 PrintWriter out = response.getWriter();
-			 out.println("<html><head></head><body>");
-			 out.println("<p>IHR KONTO WURDE FREIGESCHALTET</p>");
+			 out.println("<html><head>");
+			 out.println("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">");
+			 out.println("<link rel=\"stylesheet\" href=\"css/styles.css\">");
+			 out.println("</head><body>");
+			 out.println("<div class=\"header\"><a href=\" " + response.encodeURL("/CoolSolutions/") + "\"><img class=\"logo\" src=\"images/logo.png\"></a></div>");
+			 out.println("<div class=\"container\" style=\"margin-top:40px;\">");
+			 out.println("<div class=\"bg-success\" style=\"padding-top:15px; padding-bottom:5px; text-align:center; font-size:16px\">");
+			 out.println("<p>VIELEN DANK. IHR KONTO IST JETZT FREIGESCHALTET</p>");
 			 out.println("<p><a href=\"http://localhost:8080/CoolSolutions/Login\">ZUR ANMELDUNG</a></p>");
-			 out.println("</body></html>");
+			 out.println("</div></div></body></html>");
 		} 
 		else
 		{
 			// System.out.println("PROCESSING NICHT OK");
 			 response.setContentType("text/html"); 
 			 PrintWriter out = response.getWriter();
-			 out.println("<html><head></head><body>");
-			 out.println("<p>ZU DIESER E-MAIL-ADRESSE IST KEIN FREISCHALTCODE VORHANDEN</p>");
-			 out.println("</body></html>");
+			 out.println("<html><head>");
+			 out.println("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\" integrity=\"sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u\" crossorigin=\"anonymous\">");
+			 out.println("<link rel=\"stylesheet\" href=\"css/styles.css\">");
+			 out.println("</head><body>");
+			 out.println("<div class=\"header\"><a href=\" " + response.encodeURL("/CoolSolutions/") + "\"><img class=\"logo\" src=\"images/logo.png\"></a></div>");
+			 out.println("<div class=\"container\" style=\"margin-top:40px;\">");
+			 out.println("<div class=\"bg-danger\" style=\"padding-top:15px; padding-bottom:5px; text-align:center; font-size:16px\">");
+			 out.println("<p>DIESE E-MAIL-ADRESSE KONNTE NICHT FREIGESCHALTET WERDEN</p>");
+			 out.println("</div></div></body></html>");
 		}
 
 	}
