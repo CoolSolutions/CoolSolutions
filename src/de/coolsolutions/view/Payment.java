@@ -109,7 +109,9 @@ public class Payment extends HttpServlet
 			// Warenkorb auslesen
 			SQL = "SELECT Artikel.Name, Artikel.Preis, Warenkorb.Menge FROM Kunde INNER JOIN Warenkorb ON Kunde.ID = Warenkorb.Kunde_ID INNER JOIN Artikel ON Artikel.ID = Warenkorb.Artikel_ID WHERE Kunde.ID="
 					+ userID;
-
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(SQL);
+			
 			ArrayList<String> allArticles = new ArrayList<>();
 			while (rs.next())
 			{
