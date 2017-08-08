@@ -10,7 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class Register
+ * Stellt eine View mit dem Registrierungsformular bereit
+ * 
+ * @author Tomasz Urbaniak
+ * @since 1.5
+ * @version 1.0
  */
 @WebServlet("/Register")
 public class Register extends HttpServlet
@@ -22,6 +26,16 @@ public class Register extends HttpServlet
 	private static final long serialVersionUID = 6036990004045163360L;
 
 	/**
+	 * Stellt eine View mit dem Registrierungsformular bereit
+	 * und schickt die Daten zur Validierung und Verarbeitung an das 
+	 * Servlet: RegisterProcessing
+	 * 
+	 * @see de.coolsolutions.controller.RegisterProcessing
+	 * 
+	 * Bei negativer Validierung werden die ungültigen Eingabefelder dem Kunden
+	 * in einer Fehlermeldung als Listeneinträge angezeigt, 
+	 * die gültigen Daten werden wieder in entsprechende Eingabefelder eingefügt
+	 * 
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */

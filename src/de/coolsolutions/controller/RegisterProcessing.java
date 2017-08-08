@@ -29,7 +29,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 /**
- * Servlet implementation class Register
+ * Verarbeitet die Registrierung neuer Kunden
+ * 
+ * @author Tomasz Urbaniak
+ * @since 1.5
+ * @version 1.0
  */
 @WebServlet("/RegisterProcessing")
 public class RegisterProcessing extends HttpServlet
@@ -41,6 +45,26 @@ public class RegisterProcessing extends HttpServlet
 	private static final long serialVersionUID = 8612797131703313939L;
 
 	/**
+	 * Verarbeitet die Registrierung neuer Kunden
+	 * Dabei wird folgendes überprüft: 
+	 * - ob die E-Mail-Adresse bereits existiert 
+	 * - ob die Kombination aus PLZ und Ort gültig ist
+	 * 
+	 * Bei positiver Validierung wird für den jeweiligen Kunden
+	 * ein Saltwert zufällig generiert und zusammen mit dem Passwort ein Hashwert erzeugt.
+	 * Anschliessend wird der Kunde in die Datenbank eingetragen, das Konto jedoch noch
+	 * nicht aktiv geschaltet. Dazu wird vom Servlet ein Aktivierungslink generiert
+	 * und per Mail an den Kunden geschickt, welcher beim anklicken von dem
+	 * Servlet ActivationProcessing verarbeitet wird.
+	 * 
+	 * @see ActivationProcessing
+	 * 
+	 * Bei negativer Validierung werden:
+	 * - die Anmeldedaten an das Registrierungsformular zurückgeschickt
+	 * - ein oder mehrere Bezeichner der Eingabefelder an das 
+	 * Registrierungsformular zurückgeschickt, dessen Daten nicht gültig sind
+	 * 
+	 *  
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
@@ -66,15 +90,8 @@ public class RegisterProcessing extends HttpServlet
 			// ASCII Code zwischen 48 (0) und 122 (z) inkl. Sonderzeichen
 			int randomInt = (int) (Math.random() * 74) + 48;
 			salt += (char) randomInt;
-		}
+		}		
 		String actCode = "";
-
-		// BEISPIEL: Hash Ergebnis bei folgenden, konstanten Passwort- und
-		// Saltwerten
-		// String Cpass = "passwort";
-		// String Csalt = "JW5lY[OFFc7XHd>]Xnti=i[T1EwS:_7b";
-		// String Chash = "8AU1mhs4q39l8tHXCnTohfBzAW8+rts4wy2+WbRAub4=";
-		// System.out.println("SALT: " + salt);
 
 		String saltedPassword = password + salt;
 
@@ -87,8 +104,6 @@ public class RegisterProcessing extends HttpServlet
 		{
 			e1.printStackTrace();
 		}
-
-		// System.out.println("HASH: " + hash);
 
 		// DB Connection
 		Connection conn = null;
@@ -115,18 +130,17 @@ public class RegisterProcessing extends HttpServlet
 			SEL_CITY = "SELECT ID FROM Ort WHERE Ort = '" + city + "' AND PLZ = '" + zipcode + "'";
 			rs = stmt.executeQuery(SEL_CITY);
 
+			// Auf gültige PLZ + Ort Kombination prüfen
 			if (rs.next())
 			{
 				cityId = rs.getInt(1);
 				rs.close();
-				//System.out.println("CITY AND ZIP OK");
 			} 
 			else
 			{
 				faultyInsertion = true;
 				request.setAttribute("unknownCity", "true");
 				rs.close();
-				//System.out.println("CITY AND ZIP NOT OK");
 			}
 			
 			// Auf bereits existierende E-Mail Adresse prüfen
@@ -136,13 +150,11 @@ public class RegisterProcessing extends HttpServlet
 			{
 				faultyInsertion = true;
 				request.setAttribute("emailAlreadyExisting", "true");
-				//System.out.println("MAIL ALREADY TAKEN");
 			} 
 			
 			// Kunden in DB eintragen
 			if(!faultyInsertion)
 			{
-				//System.out.println("START INSERT");
 				INS = "INSERT INTO Kunde (Name, Vorname, Strasse, Strassennummer, E_Mail, Ort_ID, Geschlecht, Hash, Salt) ";
 				INS += "VALUES (";
 				INS += "N'" + lastname + "'";
@@ -156,7 +168,7 @@ public class RegisterProcessing extends HttpServlet
 				INS += ", N'" + salt + "')";
 
 				int ins_rows = stmt.executeUpdate(INS);
-				// TODO - bei anzahl != 1 reagieren
+				// TODO - bei Anzahl != 1 reagieren
 				
 				// Aktivation Code generieren
 				for (int i = 0; i < 16; i++)
@@ -209,7 +221,6 @@ public class RegisterProcessing extends HttpServlet
 
 		if(faultyInsertion)
 		{	
-			//System.out.println("FAULTY REDIRECT WITH ZIP: " + zipcode);
 			RequestDispatcher rd;
 			rd = getServletContext().getRequestDispatcher("/Register");
 			request.setAttribute("faultyInsertion", "true");
@@ -227,9 +238,6 @@ public class RegisterProcessing extends HttpServlet
 		}
 		else
 		{
-			
-
-			
 			Properties props = System.getProperties();
 			props.setProperty("mail.smtp.host", "localhost");
 			props.setProperty("mail.transport.protocol", "smtp");
@@ -259,7 +267,6 @@ public class RegisterProcessing extends HttpServlet
 				e.printStackTrace();
 			}
 			
-			//System.out.println("PROCESSING OK");
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
 			out.println("<html><head></head><body>VIELEN DANK FÜR DIE REGISTRIERUNG. <br />SIE ERHALTEN IN KÜRZE EINEN AKTIVIERUNGSLINK PER E-MAIL. <br />BITTE BEFOLGEN SIE DIE SCHRITTE AUS DER E-MAIL, UM IHR KONTO ZU AKTIVIEREN.</body></html>");

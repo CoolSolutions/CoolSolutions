@@ -1,14 +1,12 @@
 package de.coolsolutions.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.Base64;
 
 import javax.naming.InitialContext;
@@ -22,7 +20,12 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 /**
- * Servlet implementation class Register
+ * Verarbeitet Anmeldedaten, die über Post-Parameter an das Servlet übermittelt werden
+ * 
+ * @author Tomasz Urbaniak
+ * @since 1.5
+ * @version 1.0
+ * 
  */
 @WebServlet("/LoginProcessing")
 public class LoginProcessing extends HttpServlet
@@ -34,6 +37,16 @@ public class LoginProcessing extends HttpServlet
 	private static final long serialVersionUID = 8612797131703313939L;
 
 	/**
+	 * 
+	 * Verarbeitet Anmeldedaten, die über Post-Parameter an das Servlet übermittelt werden.
+	 * Bei erfolgreicher Anmeldung wird eine neue Session gestartet,
+	 * in der die ID des Kunden gespeichert wird. Anschliessend wird dem Kunden
+	 * die Startseite des Shop präsentiert.
+	 * Bei nicht erfolgreicher Anmeldung wird die E-Mail und die Bezeichnung des Eingabefeldes
+	 * mit der Fehleingabe an das Formular zurückgeschickt.
+	 * 
+	 * @param email String Die E-Mail-Adresse des Kunden
+	 * @param passowrd String Das Passwort des Kunden
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
@@ -92,9 +105,6 @@ public class LoginProcessing extends HttpServlet
 				{
 					e1.printStackTrace();
 				}
-				
-				//System.out.println(loc_hash + "LOCAL HASH");
-				//System.out.println(rem_hash + "REMOTE HASH");
 				
 				if(!loc_hash.equals(rem_hash)){
 					request.setAttribute("email", email);

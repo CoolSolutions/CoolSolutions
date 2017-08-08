@@ -16,7 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 /**
- * Servlet implementation class ActivationProcessing
+ * Diese Klasse verarbeitet die Aktivierung des Kundenkontos 
+ * über das Double Opt-In Verfahren
+ * 
+ * @author Tomasz Urbaniak
+ * @since 1.8
+ * @version 1.0
+ *  
  */
 @WebServlet("/Activation")
 public class ActivationProcessing extends HttpServlet
@@ -24,6 +30,15 @@ public class ActivationProcessing extends HttpServlet
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * Diese Methode verarbeitet die Aktivierung des Kundenkontos 
+	 * über das Double Opt-In Verfahren.
+	 * Dazu nimmt die Methode die Parameter aus dem Aktivierungslink entgegen
+	 * und überprüft die Daten mit den Einträgen in der Datenbank.
+	 * Bei Übereinstimmung werden die Daten aus der Tabelle für ausstehende Aktivierungen
+	 * gelöscht und das Kundenkonto wird freigeschaltet.  
+	 * 
+	 * @param mail String Die E-Mail-Adresse des Kunden
+	 * @param activation String Der Aktivierungslink
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
@@ -34,9 +49,6 @@ public class ActivationProcessing extends HttpServlet
 		String userActCode = request.getParameter("activation");
 		boolean actCodeExisting = false;
 		boolean processingSuccessful = false;
-
-		// System.out.println("EMAIL: " + userEmail);
-		// System.out.println("ACT_CODE: " + userActCode);
 
 		// DB Connection
 		Connection conn = null;
@@ -66,18 +78,15 @@ public class ActivationProcessing extends HttpServlet
 			{
 				actCodeExisting = true;
 				rs.close();
-				// System.out.println("ACT_CODE VORHANDEN");
 			} else
 			{
 				actCodeExisting = false;
 				rs.close();
-				// System.out.println("ACT_CODE NICHT VORHANDEN");
 			}
 
 			// AKTIVIERUNGSDATUM SETZEN UND ACT_CODE LÖSCHEN
 			if (actCodeExisting)
 			{
-				// System.out.println("START UPDATE");
 				LocalDateTime actDate = LocalDateTime.now();
 				String actIP = request.getRemoteAddr();
 
@@ -90,11 +99,6 @@ public class ActivationProcessing extends HttpServlet
 				DEL = "DELETE FROM Aktivierung WHERE E_Mail = '" + userEmail + "'";
 				
 				int del_rows = stmt.executeUpdate(DEL);
-				
-				System.out.println("ACT_DATE: " + actDate);
-				System.out.println("ACT_IP: " + actIP);
-				System.out.println("UPD_ROWS: " + upd_rows);
-				System.out.println("DEL_ROWS: " + del_rows);
 
 				if(upd_rows == 1 && del_rows == 1){
 					processingSuccessful = true;
@@ -135,7 +139,6 @@ public class ActivationProcessing extends HttpServlet
 
 		if (processingSuccessful)
 		{
-			// System.out.println("PROCESSING OK");
 			 response.setContentType("text/html"); 
 			 PrintWriter out = response.getWriter();
 			 out.println("<html><head>");
@@ -151,7 +154,6 @@ public class ActivationProcessing extends HttpServlet
 		} 
 		else
 		{
-			// System.out.println("PROCESSING NICHT OK");
 			 response.setContentType("text/html"); 
 			 PrintWriter out = response.getWriter();
 			 out.println("<html><head>");

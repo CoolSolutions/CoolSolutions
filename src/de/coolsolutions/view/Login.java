@@ -3,7 +3,6 @@ package de.coolsolutions.view;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,13 +10,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class Register
+ * Stellt eine View mit dem Login-Formular bereit
+ * 
+ * @author Tomasz Urbaniak
+ * @since 1.5
+ * @version 1.0
  */
 @WebServlet("/Login")
 public class Login extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
+	 * Stellt eine View mit dem Loginformular bereit
+	 * und schickt die Daten zur Validierung und Verarbeitung an das 
+	 * Servlet: LoginProcessing
+	 * 
+	 * @see de.coolsolutions.controller.LoginProcessing
+	 * 
+	 * Bei negativer Validierung werden die ungültigen Eingabefelder dem Kunden
+	 * in einer Fehlermeldung als Listeneinträge angezeigt, 
+	 * die gültigen Daten werden wieder in entsprechende Eingabefelder eingefügt
+	 * 
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
