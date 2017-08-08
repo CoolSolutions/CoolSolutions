@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 import javax.naming.InitialContext;
@@ -46,6 +47,8 @@ public class LoginProcessing extends HttpServlet
 		String loc_hash = "";
 		String salt = "";
 		String faultyInsertion = null;
+		String actDate = null;
+
 
 		// DB Connection
 		Connection conn = null;
@@ -66,7 +69,7 @@ public class LoginProcessing extends HttpServlet
 			conn = ds.getConnection();
 
 			// Ort-ID ermitteln
-			SEL = "SELECT ID, Hash, Salt FROM Kunde WHERE E_Mail = '" + email + "'";
+			SEL = "SELECT ID, KTOFreigeschaltetAm, Hash, Salt FROM Kunde WHERE E_Mail = '" + email + "'";
 
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(SEL);
@@ -74,8 +77,9 @@ public class LoginProcessing extends HttpServlet
 			if (rs.next())
 			{
 				id = rs.getInt(1);
-				rem_hash = rs.getString(2);
-				salt = rs.getString(3);
+				actDate = rs.getString(2);
+				rem_hash = rs.getString(3);
+				salt = rs.getString(4);
 
 				String saltedPassword = password + salt;
 
@@ -96,7 +100,11 @@ public class LoginProcessing extends HttpServlet
 					request.setAttribute("email", email);
 					faultyInsertion = "password";
 				}
-				else{
+				else if(actDate == null){
+					request.setAttribute("email", email);
+					faultyInsertion = "activation";					
+				}
+				else {
 					HttpSession session = request.getSession();
 					session.setAttribute("userID", id);
 				}

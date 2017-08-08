@@ -239,6 +239,7 @@ public class RegisterProcessing extends HttpServlet
 
 			try
 			{
+				// TODO benutzer@test.de gegen die Variable mail ersetzten
 				message.setFrom(new InternetAddress("benutzer@test.de"));
 				message.addRecipient(Message.RecipientType.TO, new InternetAddress(
 						"benutzer@test.de"));
@@ -261,7 +262,7 @@ public class RegisterProcessing extends HttpServlet
 			//System.out.println("PROCESSING OK");
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
-			out.println("<html><head></head><body>VIELEN DANK FÜR DIE REGISTRIERUNG</body></html>");
+			out.println("<html><head></head><body>VIELEN DANK FÜR DIE REGISTRIERUNG. <br />SIE ERHALTEN IN KÜRZE EINEN AKTIVIERUNGSLINK PER E-MAIL. <br />BITTE BEFOLGEN SIE DIE SCHRITTE AUS DER E-MAIL, UM IHR KONTO ZU AKTIVIEREN.</body></html>");
 		}
 
 	}

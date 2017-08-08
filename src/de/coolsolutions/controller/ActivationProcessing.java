@@ -161,7 +161,7 @@ public class ActivationProcessing extends HttpServlet
 			 out.println("<div class=\"header\"><a href=\" " + response.encodeURL("/CoolSolutions/") + "\"><img class=\"logo\" src=\"images/logo.png\"></a></div>");
 			 out.println("<div class=\"container\" style=\"margin-top:40px;\">");
 			 out.println("<div class=\"bg-danger\" style=\"padding-top:15px; padding-bottom:5px; text-align:center; font-size:16px\">");
-			 out.println("<p>ZU DIESER E-MAIL-ADRESSE IST KEIN FREISCHALTCODE VORHANDEN</p>");
+			 out.println("<p>DIESE E-MAIL-ADRESSE KONNTE NICHT FREIGESCHALTET WERDEN</p>");
 			 out.println("</div></div></body></html>");
 		}
 
