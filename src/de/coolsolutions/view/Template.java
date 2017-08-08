@@ -51,9 +51,6 @@ public class Template extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
     /**
      * 
      * Die Methode doGet(request, response) liest zuerst die ArtikelID aus dem
@@ -68,7 +65,7 @@ public class Template extends HttpServlet {
      * 
      * Falls eine Session gestartet wurde (der Kunde ist angemeldet), wird unter den Artikeldaten die 
      * Schaltflaeche "Zum Warenkorb hinzufügen" generiert. Der Klick darauf ruft die Seite erneut auf,
-     * dabei wird der Parameter "ordered=true", der Parameter "userID" und der Parameter "articleID" mit
+     * dabei wird der Hidden-Parameter "ordered=true", der Parameter "userID" und der Parameter "articleID" mit
      * uebergeben. Wenn der Parameter "ordered=true" von der doGet(request, response)-Methode gefunden wird,
      * wird der Artikel mit dem entsprechenden Parameter "articleID" in der Tabelle "Warenkorb", die mit dem
      * Kunden ueber eine Primaer-Fremd-Schluessel-Beziehung verbunden ist, gespeichert. Es wird aber vorher 
@@ -79,6 +76,7 @@ public class Template extends HttpServlet {
      * @param request HttpServletRequest Der Parameter ist die Anfrage an den Servlet 
 	 * @param response HttpServletResponse Der Parameter ist die Rueckmaldung des Servlets
 	 * @throws ServletException, IOException
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      * 
      */
 	@SuppressWarnings("resource")

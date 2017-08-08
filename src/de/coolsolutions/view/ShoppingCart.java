@@ -54,33 +54,32 @@ public class ShoppingCart extends HttpServlet {
     }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-    /**
      * 
-     * Die Methode doGet(request, response) liest zuerst die ArtikelID aus dem
-     * Request aus, die immer uebergeben wird, weil ein Artikel immer angezeigt werden muss.
-     * Es sind keine Requests an diesen Servlet programmiert, die keinen Parameter "artikelID" enthalten.
+     * Die Methode doGet(request, response) liest zuerst die SessionID aus.
+     * Die SessionID ist auch die ID des Kunden aus der Datenbanktabelle "Kunde".
      * 
-     * Im naechsten Schritt prueft die Methode, ob eine Session gestartet wurde.
-     * Dabei wird nach dem Session-Attribut "userID" geschaut.
+     * Im weiteren Schritt gibt die Methode den Inhalt des Warenkorbs des Kunden mit dieser
+     * KundenID aus. Dabei wird fuer einen Artikel eine Zeile genommen. D.h., wenn in einem
+     * Datensatz die Menge = 3 steht, wird dieser eine Datensatz  3-mal nacheinander ausgegeben.
+     * Jede Zeile steht fuer einen Artikel.
+     * Am Ende jeder Artikelzeile wird eine Delete-Schaltflaeche generiert. Beim Klicken auf
+     * diese Schaltflaeche ruft sich die Seite selbst nochmals auf. Dabei werden folgende 
+     * Hidden-Parameter mit uebergeben:
+     * (1) deleted=true
+	 * (2) articleToDelete="ArtikelID"
+	 * 
+	 * Falls die doGet()-Methode diese Parameter im Request entdeckt wird der Artikel mit entsprechender
+	 * ArtikelID aus dem Warenkorb geloescht bzw. seine Menge um 1 verringert, je nachdem, was die 
+	 * entsprechende Pruefung ergeben hat. 
      * 
-     * Falls KEINE Session gestartet wurde (der Kunde ist nicht angemeldet), werden der Name, die Beschreibung und
-     * der Preis des Artikels mit der ArtikelID ausgeben, die mit dem Request-Parameter mituebergeben wurde. 
-     * 
-     * Falls eine Session gestartet wurde (der Kunde ist angemeldet), wird unter den Artikeldaten die 
-     * Schaltflaeche "Zum Warenkorb hinzufügen" generiert. Der Klick darauf ruft die Seite erneut auf,
-     * dabei wird der Parameter "ordered=true", der Parameter "userID" und der Parameter "articleID" mit
-     * uebergeben. Wenn der Parameter "ordered=true" von der doGet(request, response)-Methode gefunden wird,
-     * wird der Artikel mit dem entsprechenden Parameter "articleID" in der Tabelle "Warenkorb", die mit dem
-     * Kunden ueber eine Primaer-Fremd-Schluessel-Beziehung verbunden ist, gespeichert. Es wird aber vorher 
-     * geprueft, ob sich dieser Artikel noch nicht im Warenkorn des Kunden befinden. Falls nein, wird es 
-     * dort gespeichert, er dort doch schon liegt, wird der Datensatz mit dem Artikel aktualisiert, 
-     * indem der Wert in der Spalte "Menge" um 1 erhoeht wird.  
+     * Unter der Artikelliste wird der Gesamtpreis aller im Warenkorb befindlichen Artikel ausgegeben
+     * und dadrunter die Schaltflaeche "Zahlungsart waehlen" (noch kein Abschluss des Kaufvertrages), 
+     * die zur naechsten Seite fuehrt, wo der Kunde die Zahlungsmethode auswaelen kann.
      * 
      * @param request HttpServletRequest Der Parameter ist die Anfrage an den Servlet 
 	 * @param response HttpServletResponse Der Parameter ist die Rueckmaldung des Servlets
 	 * @throws ServletException, IOException
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      * 
      */
 	@SuppressWarnings("resource")
@@ -108,7 +107,7 @@ public class ShoppingCart extends HttpServlet {
 		Statement stmt = null;
 		ResultSet rs = null;
 		
-		// Session übernehmen. Wenn keine Session gestartet, userID = 0
+		// Session uebernehmen. Wenn keine Session gestartet, userID = 0
 		int userID = 0;
 		
 		HttpSession session = request.getSession();
@@ -156,7 +155,7 @@ public class ShoppingCart extends HttpServlet {
 						+ "<h2 align=center><b>" + cart2 + "</b></h2>"
 						+ "<h4>&nbsp&nbsp&nbsp" + yourOrder + "</h4>");
 			
-			// Falls ein Artikel zum Löschen markiert wurde, diesen Artikel aus der DB löschen
+			// Falls ein Artikel zum Loeschen markiert wurde, diesen Artikel aus der Datenbank löschen
 			if(request.getParameter("deleted") != null && request.getParameter("deleted").equals("true"))
 			{
 				// Bestellmenge des zu loeschenden Artikels auslesen
@@ -229,7 +228,7 @@ public class ShoppingCart extends HttpServlet {
 				int adjust = (int)(totalAmount * 100);
 				totalAmount = (float)adjust / 100;
 				out.println("&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>" + totalAm + ": " + totalAmount + "</b>");
-				out.println("</br></br></br><form action=http://localhost:8080/CoolSolutions/Besnik>&nbsp&nbsp&nbsp&nbsp<input type=submit name=Forward value=\"" + paymentMethod + "\" >");
+				out.println("</br></br></br><form action=http://localhost:8080/CoolSolutions/Payment>&nbsp&nbsp&nbsp&nbsp<input type=submit name=Forward value=\"" + paymentMethod + "\" >");
 				out.println("</br>&nbsp&nbsp&nbsp&nbsp(" + noContract + ")");
 			}
 			else

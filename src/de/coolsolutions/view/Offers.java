@@ -51,10 +51,6 @@ public class Offers extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-    
     /**
      * 
      * Die Methode doGet(request, response) prueft zuerst, ob eine Session gestartet wurde.
@@ -82,6 +78,7 @@ public class Offers extends HttpServlet {
      * @param request HttpServletRequest Der Parameter ist die Anfrage an den Servlet 
 	 * @param response HttpServletResponse Der Parameter ist die Rueckmaldung des Servlets
 	 * @throws ServletException, IOException
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      *
      */
 	@SuppressWarnings("resource")
